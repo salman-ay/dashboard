@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>داشبورد الإيرادات | حيوي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body { font-family: 'Cairo', sans-serif; background-color: #FAF5FF; } /* Very light purple bg */
+        .card { background-color: white; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.1); border: 1px solid #F3E8FF; }
+        .gradient-text { background: linear-gradient(to right, #7C3AED, #D97706); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="flex min-h-screen">
+        <aside class="hidden lg:flex flex-col w-64 bg-white border-l border-purple-100 h-screen sticky top-0 z-20">
+            <div class="p-6 flex items-center justify-center">
+                <div class="text-2xl font-bold text-purple-700 flex items-center gap-2">
+                    <i class="ph ph-lightning text-amber-500 weight-fill"></i>
+                    <span>إيراداتي</span>
+                </div>
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="#" class="flex items-center gap-3 p-3 text-white bg-gradient-to-r from-purple-600 to-purple-500 rounded-xl font-bold shadow-lg shadow-purple-500/30">
+                    <i class="ph ph-squares-four text-xl text-amber-300"></i>
+                    ملخص الإيرادات
+                </a>
+                <a href="#" class="flex items-center gap-3 p-3 text-gray-500 hover:bg-purple-50 hover:text-purple-700 rounded-xl transition">
+                    <i class="ph ph-bank text-xl"></i> تحليل الحسابات
+                </a>
+            </nav>
+        </aside>
+
+        <main class="flex-1 flex flex-col min-w-0 p-4 lg:p-8">
+            <header class="flex justify-between items-center mb-8">
+                <h1 class="text-2xl font-bold text-purple-900">ملخص الإيرادات</h1>
+                <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center font-bold border-2 border-amber-200">م</div>
+            </header>
+
+            <div class="bg-white p-4 rounded-2xl mb-6 flex justify-between items-center border border-purple-100">
+                <div class="flex gap-4">
+                    <select class="bg-purple-50 text-purple-900 rounded-lg px-4 py-2 border-none outline-none font-bold"><option>2025</option></select>
+                </div>
+                <button class="bg-amber-500 hover:bg-amber-600 text-white px-6 py-2 rounded-lg font-bold shadow-lg shadow-amber-500/30">تطبيق</button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="card p-6 border-b-4 border-b-purple-600">
+                    <div class="flex justify-between mb-4">
+                        <span class="text-gray-500 font-bold">المفوتر</span>
+                        <div class="p-2 bg-purple-100 text-purple-600 rounded-lg"><i class="ph ph-receipt"></i></div>
+                    </div>
+                    <div class="text-3xl font-bold text-gray-800">540k</div>
+                </div>
+                
+                <div class="card p-6 border-b-4 border-b-amber-500">
+                    <div class="flex justify-between mb-4">
+                        <span class="text-gray-500 font-bold">المحصل</span>
+                        <div class="p-2 bg-amber-100 text-amber-600 rounded-lg"><i class="ph ph-coins"></i></div>
+                    </div>
+                    <div class="text-3xl font-bold text-gray-800">480k</div>
+                    <span class="text-sm font-bold text-purple-600 bg-purple-100 px-2 py-1 rounded mt-2 inline-block">ممتاز</span>
+                </div>
+
+                <div class="card p-6 border-b-4 border-b-rose-500">
+                    <div class="flex justify-between mb-4">
+                        <span class="text-gray-500 font-bold">الفجوة</span>
+                        <div class="p-2 bg-rose-100 text-rose-600 rounded-lg"><i class="ph ph-warning"></i></div>
+                    </div>
+                    <div class="text-3xl font-bold text-gray-800">59k</div>
+                </div>
+
+                 <div class="card p-6 border-b-4 border-b-indigo-500">
+                    <div class="flex justify-between mb-4">
+                        <span class="text-gray-500 font-bold">النسبة</span>
+                        <div class="p-2 bg-indigo-100 text-indigo-600 rounded-lg"><i class="ph ph-percent"></i></div>
+                    </div>
+                    <div class="text-3xl font-bold text-gray-800">89%</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="card p-6 lg:col-span-2">
+                    <h3 class="font-bold text-purple-900 mb-4 text-lg">تحليل الأداء</h3>
+                    <div class="relative h-72"><canvas id="vibChart"></canvas></div>
+                </div>
+                <div class="card p-6 flex flex-col items-center justify-center bg-gradient-to-b from-purple-900 to-indigo-900 text-white border-none">
+                    <h3 class="font-bold mb-4 opacity-80">تحقيق الهدف</h3>
+                    <div class="relative h-48 w-48">
+                        <canvas id="vibTarget"></canvas>
+                        <div class="absolute inset-0 flex items-center justify-center"><span class="text-3xl font-bold">40%</span></div>
+                    </div>
+                    <p class="mt-4 text-amber-300 font-bold">باقي 60% للوصول</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Vibrant Theme Config
+        new Chart(document.getElementById('vibChart'), {
+            type: 'bar', // Using Bar for higher impact
+            data: {
+                labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
+                datasets: [
+                    {
+                        label: 'المحصل',
+                        data: [65, 59, 80, 81, 56, 95],
+                        backgroundColor: '#F59E0B', // Amber
+                        borderRadius: 6,
+                    },
+                    {
+                        label: 'المفوتر',
+                        data: [70, 62, 85, 90, 60, 100],
+                        backgroundColor: '#7C3AED', // Purple
+                        borderRadius: 6,
+                    }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: { x: { grid: { display: false } }, y: { grid: { color: '#F3E8FF' } } }
+            }
+        });
+
+        new Chart(document.getElementById('vibTarget'), {
+            type: 'doughnut',
+            data: {
+                datasets: [{ data: [40, 60], backgroundColor: ['#F59E0B', 'rgba(255,255,255,0.1)'], borderWidth: 0, cutout: '80%' }]
+            }
+        });
+    </script>
+</body>
+</html>

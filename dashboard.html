@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>داشبورد الإيرادات | ملخص</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        body { font-family: 'Cairo', sans-serif; background-color: #F5F7FA; }
+        .card { background-color: white; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: transform 0.2s; }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        
+        /* تخصيص شريط التمرير */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="flex min-h-screen">
+        
+        <aside class="hidden lg:flex flex-col w-64 bg-white border-l border-gray-200 h-screen sticky top-0 z-20">
+            <div class="p-6 flex items-center justify-center border-b border-gray-100">
+                <div class="text-2xl font-bold text-blue-900 flex items-center gap-2">
+                    <i class="ph ph-chart-polar"></i>
+                    <span>إيراداتي</span>
+                </div>
+            </div>
+
+            <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+                <a href="#" class="flex items-center gap-3 p-3 text-blue-900 bg-blue-50 rounded-lg font-bold">
+                    <i class="ph ph-squares-four text-xl"></i>
+                    ملخص الإيرادات
+                </a>
+                <a href="#" class="flex items-center gap-3 p-3 text-gray-500 hover:bg-gray-50 hover:text-blue-900 rounded-lg transition">
+                    <i class="ph ph-bank text-xl"></i>
+                    تحليل الحسابات
+                </a>
+                <a href="#" class="flex items-center gap-3 p-3 text-gray-500 hover:bg-gray-50 hover:text-blue-900 rounded-lg transition">
+                    <i class="ph ph-tag text-xl"></i>
+                    تحليل التبويب
+                </a>
+                <a href="#" class="flex items-center gap-3 p-3 text-gray-500 hover:bg-gray-50 hover:text-blue-900 rounded-lg transition">
+                    <i class="ph ph-trend-up text-xl"></i>
+                    مقارنة السنوات
+                </a>
+                <a href="#" class="flex items-center gap-3 p-3 text-gray-500 hover:bg-gray-50 hover:text-blue-900 rounded-lg transition">
+                    <i class="ph ph-table text-xl"></i>
+                    الجدول التفصيلي
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-gray-100">
+                <a href="#" class="flex items-center gap-3 p-3 text-red-500 hover:bg-red-50 rounded-lg transition">
+                    <i class="ph ph-sign-out text-xl"></i>
+                    تسجيل خروج
+                </a>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+            
+            <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 lg:px-8">
+                <div class="flex items-center gap-4">
+                    <button id="mobileMenuBtn" class="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                        <i class="ph ph-list text-2xl"></i>
+                    </button>
+                    <h1 class="text-xl font-bold text-gray-800">ملخص الإيرادات</h1>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <div class="hidden md:flex items-center bg-gray-100 rounded-lg px-3 py-2">
+                        <i class="ph ph-magnifying-glass text-gray-400 ml-2"></i>
+                        <input type="text" placeholder="بحث..." class="bg-transparent border-none outline-none text-sm w-48">
+                    </div>
+                    <button class="p-2 text-gray-500 hover:bg-gray-100 rounded-full relative">
+                        <i class="ph ph-bell text-xl"></i>
+                        <span class="absolute top-2 left-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+                    </button>
+                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold border border-blue-200">
+                        م
+                    </div>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-4 lg:p-8">
+                
+                <div class="bg-white p-4 rounded-xl shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
+                    <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+                        <div class="relative w-full md:w-auto">
+                            <span class="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400"><i class="ph ph-calendar"></i></span>
+                            <select class="w-full md:w-48 bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block pr-10 pl-2.5 py-2.5 outline-none">
+                                <option>يناير 2025 - يونيو 2025</option>
+                                <option>السنة الحالية</option>
+                                <option>الشهر الماضي</option>
+                            </select>
+                        </div>
+                        <div class="relative w-full md:w-auto">
+                            <select class="w-full md:w-48 bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2.5 outline-none">
+                                <option selected>جميع حسابات الإيراد</option>
+                                <option>استشارات</option>
+                                <option>مبيعات</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="w-full md:w-auto bg-blue-900 hover:bg-blue-800 text-white font-medium rounded-lg text-sm px-5 py-2.5 transition text-center flex items-center justify-center gap-2">
+                        <i class="ph ph-funnel"></i>
+                        تطبيق الفلاتر
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="card p-5 border-r-4 border-blue-500">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-gray-500 text-sm font-medium">إجمالي المفوتر</h3>
+                            <span class="p-1.5 rounded bg-blue-50 text-blue-600"><i class="ph ph-receipt text-lg"></i></span>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-800 mb-1">540,200 <span class="text-sm font-normal text-gray-500">ر.س</span></div>
+                        <div class="flex items-center text-xs text-green-600 font-medium">
+                            <i class="ph ph-trend-up mr-1"></i>
+                            <span>+12% عن الشهر الماضي</span>
+                        </div>
+                    </div>
+
+                    <div class="card p-5 border-r-4 border-green-500 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-16 h-16 bg-green-50 rounded-br-full -mt-2 -ml-2 opacity-50"></div>
+                        <div class="flex justify-between items-start mb-2 relative z-10">
+                            <h3 class="text-gray-500 text-sm font-medium">إجمالي المحصل</h3>
+                            <span class="p-1.5 rounded bg-green-50 text-green-600"><i class="ph ph-coins text-lg"></i></span>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-900 mb-1 relative z-10">480,500 <span class="text-sm font-normal text-gray-500">ر.س</span></div>
+                        <div class="flex items-center text-xs text-green-600 font-medium relative z-10">
+                            <i class="ph ph-check-circle mr-1"></i>
+                            <span>أداء ممتاز</span>
+                        </div>
+                    </div>
+
+                    <div class="card p-5 border-r-4 border-orange-400">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-gray-500 text-sm font-medium">الفجوة (غير محصل)</h3>
+                            <span class="p-1.5 rounded bg-orange-50 text-orange-600"><i class="ph ph-warning-circle text-lg"></i></span>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-800 mb-1">59,700 <span class="text-sm font-normal text-gray-500">ر.س</span></div>
+                        <div class="flex items-center text-xs text-gray-500">
+                            <span>تمثل 11% من المفوتر</span>
+                        </div>
+                    </div>
+
+                    <div class="card p-5 border-r-4 border-purple-500">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-gray-500 text-sm font-medium">نسبة التحصيل</h3>
+                            <span class="p-1.5 rounded bg-purple-50 text-purple-600"><i class="ph ph-percent text-lg"></i></span>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-800 mb-1">89%</div>
+                        <div class="w-full bg-gray-200 rounded-full h-1.5 mt-2">
+                            <div class="bg-purple-500 h-1.5 rounded-full" style="width: 89%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    <div class="card p-4 flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-xs mb-1">المستهدف السنوي</p>
+                            <p class="font-bold text-lg">1,200,000 <span class="text-xs text-gray-400">ر.س</span></p>
+                        </div>
+                        <div class="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
+                            <i class="ph ph-target text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="card p-4 flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-xs mb-1">نسبة تحقيق المستهدف</p>
+                            <p class="font-bold text-lg text-blue-700">40%</p>
+                        </div>
+                        <div class="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+                            <i class="ph ph-chart-pie-slice text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="card p-4 flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-xs mb-1">النمو السنوي (YoY)</p>
+                            <p class="font-bold text-lg text-green-600">+15% <i class="ph ph-caret-up text-sm"></i></p>
+                        </div>
+                        <div class="h-10 w-10 rounded-full bg-green-50 flex items-center justify-center text-green-600">
+                            <i class="ph ph-chart-line-up text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                    
+                    <div class="card p-6 lg:col-span-2">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-bold text-gray-800">الأداء الشهري: المفوتر vs المحصل</h3>
+                            <button class="text-gray-400 hover:text-blue-900"><i class="ph ph-dots-three-outline text-xl"></i></button>
+                        </div>
+                        <div class="relative h-72 w-full">
+                            <canvas id="mainChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="card p-6 flex flex-col items-center justify-center">
+                        <h3 class="font-bold text-gray-800 mb-4 w-full text-right">تحقيق المستهدف</h3>
+                        <div class="relative h-48 w-48">
+                            <canvas id="targetChart"></canvas>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                <span class="text-3xl font-bold text-gray-800">40%</span>
+                                <span class="text-xs text-gray-500">من الهدف السنوي</span>
+                            </div>
+                        </div>
+                        <div class="mt-6 w-full">
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-500">المحصل: 480k</span>
+                                <span class="text-gray-500">الهدف: 1.2M</span>
+                            </div>
+                            <div class="w-full bg-gray-100 rounded-full h-2">
+                                <div class="bg-blue-600 h-2 rounded-full" style="width: 40%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-6">
+                    <h3 class="font-bold text-gray-800 mb-4">مقارنة سريعة بالسنة السابقة (نفس الفترة)</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-right text-gray-500">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 rounded-r-lg">المؤشر</th>
+                                    <th scope="col" class="px-6 py-3">السنة الحالية (2025)</th>
+                                    <th scope="col" class="px-6 py-3">السنة السابقة (2024)</th>
+                                    <th scope="col" class="px-6 py-3 rounded-l-lg">التغيير</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="bg-white border-b hover:bg-gray-50">
+                                    <td class="px-6 py-4 font-medium text-gray-900">إجمالي المحصل</td>
+                                    <td class="px-6 py-4 font-bold">480,500 ر.س</td>
+                                    <td class="px-6 py-4">410,000 ر.س</td>
+                                    <td class="px-6 py-4 text-green-600 font-bold">+17%</td>
+                                </tr>
+                                <tr class="bg-white hover:bg-gray-50">
+                                    <td class="px-6 py-4 font-medium text-gray-900">نسبة التحصيل</td>
+                                    <td class="px-6 py-4 font-bold">89%</td>
+                                    <td class="px-6 py-4">85%</td>
+                                    <td class="px-6 py-4 text-green-600 font-bold">+4%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <div id="mobileMenuOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden"></div>
+    
+    <aside id="mobileSidebar" class="fixed top-0 right-0 z-40 w-64 h-screen transition-transform translate-x-full bg-white border-l border-gray-200 lg:hidden">
+        <div class="p-6 flex items-center justify-between border-b border-gray-100">
+            <div class="text-xl font-bold text-blue-900 flex items-center gap-2">
+                <i class="ph ph-chart-polar"></i>
+                <span>إيراداتي</span>
+            </div>
+            <button id="closeMobileMenu" class="text-gray-500"><i class="ph ph-x text-xl"></i></button>
+        </div>
+        <nav class="p-4 space-y-2">
+            <a href="#" class="flex items-center gap-3 p-3 text-blue-900 bg-blue-50 rounded-lg font-bold">
+                <i class="ph ph-squares-four text-xl"></i>
+                ملخص الإيرادات
+            </a>
+            <a href="#" class="flex items-center gap-3 p-3 text-gray-500">
+                <i class="ph ph-bank text-xl"></i>
+                تحليل الحسابات
+            </a>
+            <a href="#" class="flex items-center gap-3 p-3 text-gray-500">
+                <i class="ph ph-tag text-xl"></i>
+                تحليل التبويب
+            </a>
+            <a href="#" class="flex items-center gap-3 p-3 text-gray-500">
+                <i class="ph ph-table text-xl"></i>
+                الجدول التفصيلي
+            </a>
+        </nav>
+    </aside>
+
+    <script>
+        // --- تهيئة المخططات (Charts Config) ---
+        
+        // 1. المخطط الرئيسي (Line Chart)
+        const ctxMain = document.getElementById('mainChart').getContext('2d');
+        new Chart(ctxMain, {
+            type: 'line',
+            data: {
+                labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
+                datasets: [
+                    {
+                        label: 'المحصل',
+                        data: [65000, 59000, 80000, 81000, 56000, 95000],
+                        borderColor: '#10B981', // Green
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'المفوتر',
+                        data: [70000, 62000, 85000, 90000, 60000, 100000],
+                        borderColor: '#3B82F6', // Blue
+                        borderWidth: 2,
+                        borderDash: [5, 5], // Dashed line
+                        tension: 0.4,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        align: 'end', // محاذاة لليمين في RTL
+                        labels: { font: { family: 'Cairo' }, usePointStyle: true }
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true, grid: { borderDash: [2, 4] } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 2. مخطط الهدف (Doughnut Chart)
+        const ctxTarget = document.getElementById('targetChart').getContext('2d');
+        new Chart(ctxTarget, {
+            type: 'doughnut',
+            data: {
+                labels: ['محقق', 'متبقي'],
+                datasets: [{
+                    data: [40, 60],
+                    backgroundColor: ['#2563EB', '#F3F4F6'],
+                    borderWidth: 0,
+                    cutout: '75%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false }, tooltip: { enabled: false } }
+            }
+        });
+
+        // --- تفاعلات الجوال (Mobile Menu Interaction) ---
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const closeMobileMenu = document.getElementById('closeMobileMenu');
+        const mobileSidebar = document.getElementById('mobileSidebar');
+        const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+
+        function toggleMenu() {
+            const isClosed = mobileSidebar.classList.contains('translate-x-full');
+            if (isClosed) {
+                mobileSidebar.classList.remove('translate-x-full');
+                mobileMenuOverlay.classList.remove('hidden');
+            } else {
+                mobileSidebar.classList.add('translate-x-full');
+                mobileMenuOverlay.classList.add('hidden');
+            }
+        }
+
+        mobileMenuBtn.addEventListener('click', toggleMenu);
+        closeMobileMenu.addEventListener('click', toggleMenu);
+        mobileMenuOverlay.addEventListener('click', toggleMenu);
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>داشبورد الإيرادات | أحادي اللون</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { brand: { 50: '#f0fdfa', 100: '#ccfbf1', 500: '#14b8a6', 700: '#0f766e', 900: '#134e4a' } } } }
+        }
+    </script>
+    <style>
+        body { font-family: 'Cairo', sans-serif; background-color: #f0fdfa; color: #134e4a; }
+        .card { background-color: white; border: 1px solid #ccfbf1; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(20, 184, 166, 0.05); }
+    </style>
+</head>
+<body class="bg-brand-50">
+
+    <div class="flex min-h-screen">
+        <aside class="hidden lg:flex flex-col w-64 bg-white border-l border-brand-100 h-screen sticky top-0">
+            <div class="p-6 border-b border-brand-50">
+                <div class="text-2xl font-bold text-brand-900 flex items-center gap-2">
+                    <i class="ph ph-waves text-brand-500"></i>
+                    <span>أوشن</span>
+                </div>
+            </div>
+            <nav class="flex-1 p-4 space-y-1">
+                <a href="#" class="flex items-center gap-3 p-3 text-brand-900 bg-brand-100 rounded-md font-bold">
+                    <i class="ph ph-squares-four text-lg"></i> ملخص
+                </a>
+                <a href="#" class="flex items-center gap-3 p-3 text-brand-700 hover:bg-brand-50 rounded-md transition">
+                    <i class="ph ph-chart-bar text-lg"></i> التحليلات
+                </a>
+            </nav>
+        </aside>
+
+        <main class="flex-1 p-6">
+            <header class="flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-bold text-brand-900">نظرة عامة</h1>
+                <div class="bg-white p-2 rounded-md shadow-sm border border-brand-100 flex gap-2">
+                    <button class="px-3 py-1 bg-brand-500 text-white rounded text-sm">شهري</button>
+                    <button class="px-3 py-1 text-brand-700 hover:bg-brand-50 rounded text-sm">سنوي</button>
+                </div>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="card p-4">
+                    <p class="text-brand-500 text-xs font-bold uppercase tracking-wider mb-1">المفوتر</p>
+                    <p class="text-2xl font-bold text-brand-900">540,200</p>
+                </div>
+                <div class="card p-4 bg-brand-900 text-white border-none">
+                    <p class="text-brand-100 text-xs font-bold uppercase tracking-wider mb-1">المحصل</p>
+                    <p class="text-2xl font-bold">480,500</p>
+                    <p class="text-xs text-brand-200 mt-2 opacity-80">90% من الإجمالي</p>
+                </div>
+                <div class="card p-4">
+                    <p class="text-brand-500 text-xs font-bold uppercase tracking-wider mb-1">الفجوة</p>
+                    <p class="text-2xl font-bold text-brand-900">59,700</p>
+                </div>
+                <div class="card p-4">
+                    <p class="text-brand-500 text-xs font-bold uppercase tracking-wider mb-1">نسبة النمو</p>
+                    <p class="text-2xl font-bold text-brand-900">12%</p>
+                </div>
+            </div>
+
+            <div class="card p-6 mb-6">
+                <h3 class="font-bold text-brand-900 mb-4">تدفق الإيرادات</h3>
+                <div class="h-64"><canvas id="monoChart"></canvas></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="card p-4 flex items-center justify-between">
+                     <div>
+                         <h4 class="font-bold text-brand-900">هدف العام</h4>
+                         <p class="text-sm text-brand-500">حالة التقدم الحالية</p>
+                     </div>
+                     <div class="h-16 w-16">
+                         <canvas id="monoTarget"></canvas>
+                     </div>
+                </div>
+                <div class="card p-4">
+                    <table class="w-full text-sm text-right">
+                        <tr class="border-b border-brand-50">
+                            <td class="py-2 text-brand-500">مبيعات</td>
+                            <td class="py-2 font-bold text-brand-900">60%</td>
+                        </tr>
+                        <tr>
+                            <td class="py-2 text-brand-500">خدمات</td>
+                            <td class="py-2 font-bold text-brand-900">40%</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Monochromatic Teal Config
+        new Chart(document.getElementById('monoChart'), {
+            type: 'line',
+            data: {
+                labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
+                datasets: [
+                    {
+                        label: 'المحصل',
+                        data: [65, 59, 80, 81, 56, 95],
+                        borderColor: '#0f766e', // Dark Teal
+                        backgroundColor: '#ccfbf1', // Light Teal
+                        fill: true,
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false } }, y: { grid: { borderDash: [4, 4] } } } }
+        });
+
+        new Chart(document.getElementById('monoTarget'), {
+            type: 'doughnut',
+            data: { datasets: [{ data: [40, 60], backgroundColor: ['#0f766e', '#e2e8f0'], borderWidth: 0, cutout: '70%' }] },
+            options: { plugins: { legend: { display: false }, tooltip: { enabled: false } } }
+        });
+    </script>
+</body>
+</html>
