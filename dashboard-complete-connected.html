@@ -1,0 +1,1754 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>داشبورد الإيرادات | ملخص</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- For CSV parsing (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <!-- For Excel export -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+
+    <style>
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background-color: #F5F7FA; 
+        }
+        .card { 
+            background-color: white; 
+            border-radius: 12px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02); 
+            transition: transform 0.2s, box-shadow 0.2s; 
+        }
+        .card:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+        }
+        .page { display: none; }
+        .page.active { display: block; }
+        .nav-item { transition: all 0.2s; }
+        .nav-item.active { 
+            background-color: #1E40AF; 
+            color: white; 
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .loading-spinner {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 10;
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        .sort-asc::after {
+            content: ' ▲';
+            font-size: 10px;
+        }
+        .sort-desc::after {
+            content: ' ▼';
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside class="hidden lg:flex flex-col w-64 bg-white border-l border-gray-200 h-screen sticky top-0 z-20">
+            <div class="p-6 flex items-center justify-center border-b border-gray-100">
+                <div class="text-2xl font-bold text-blue-900 flex items-center gap-2">
+                    <i class="ph ph-chart-polar"></i>
+                    <span>إيراداتي</span>
+                </div>
+            </div>
+
+            <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+                <a href="#" onclick="showPage('overview'); return false;" class="nav-item active flex items-center gap-3 p-3 text-white bg-blue-900 rounded-lg font-bold">
+                    <i class="ph ph-squares-four text-xl"></i>
+                    ملخص الإيرادات
+                </a>
+                <a href="#" onclick="showPage('accounts'); return false;" class="nav-item flex items-center gap-3 p-3 text-gray-500 hover:bg-gray-50 hover:text-blue-900 rounded-lg transition">
+                    <i class="ph ph-bank text-xl"></i>
+                    تحليل الحسابات
+                </a>
+                <a href="#" onclick="showPage('tabs'); return false;" class="nav-item flex items-center gap-3 p-3 text-gray-500 hover:bg-gray-50 hover:text-blue-900 rounded-lg transition">
+                    <i class="ph ph-tag text-xl"></i>
+                    تحليل التبويب
+                </a>
+                <a href="#" onclick="showPage('comparison'); return false;" class="nav-item flex items-center gap-3 p-3 text-gray-500 hover:bg-gray-50 hover:text-blue-900 rounded-lg transition">
+                    <i class="ph ph-trend-up text-xl"></i>
+                    مقارنة السنوات
+                </a>
+                <a href="#" onclick="showPage('details'); return false;" class="nav-item flex items-center gap-3 p-3 text-gray-500 hover:bg-gray-50 hover:text-blue-900 rounded-lg transition">
+                    <i class="ph ph-table text-xl"></i>
+                    الجدول التفصيلي
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-gray-100">
+                <a href="#" class="flex items-center gap-3 p-3 text-red-500 hover:bg-red-50 rounded-lg transition">
+                    <i class="ph ph-sign-out text-xl"></i>
+                    تسجيل خروج
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+            <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 lg:px-8">
+                <div class="flex items-center gap-4">
+                    <button id="mobileMenuBtn" class="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                        <i class="ph ph-list text-2xl"></i>
+                    </button>
+                    <h1 id="pageTitle" class="text-xl font-bold text-gray-800">ملخص الإيرادات</h1>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <button id="refreshBtn" class="p-2 text-gray-500 hover:bg-gray-100 rounded-full transition" title="تحديث البيانات">
+                        <i class="ph ph-arrow-clockwise text-xl"></i>
+                    </button>
+                    <div class="hidden md:flex items-center bg-gray-100 rounded-lg px-3 py-2">
+                        <i class="ph ph-magnifying-glass text-gray-400 ml-2"></i>
+                        <input type="text" id="globalSearch" placeholder="بحث..." class="bg-transparent border-none outline-none text-sm w-48">
+                    </div>
+                    <button class="p-2 text-gray-500 hover:bg-gray-100 rounded-full relative">
+                        <i class="ph ph-bell text-xl"></i>
+                        <span class="absolute top-2 left-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+                    </button>
+                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold border border-blue-200">
+                        م
+                    </div>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-4 lg:p-8">
+                
+                <!-- Page 1: Overview -->
+                <div id="overview" class="page active">
+                    <!-- Filters -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
+                        <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+                            <div class="relative w-full md:w-auto">
+                                <span class="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400"><i class="ph ph-calendar"></i></span>
+                                <select id="filterYear" class="w-full md:w-48 bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block pr-10 pl-2.5 py-2.5 outline-none">
+                                    <option value="2025">2025</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2023">2023</option>
+                                </select>
+                            </div>
+                            <div class="relative w-full md:w-auto">
+                                <select id="filterMonthRange" class="w-full md:w-48 bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2.5 outline-none">
+                                    <option value="all">جميع الأشهر</option>
+                                    <option value="1-6">يناير - يونيو</option>
+                                    <option value="7-12">يوليو - ديسمبر</option>
+                                </select>
+                            </div>
+                            <div class="relative w-full md:w-auto">
+                                <select id="filterAccount" class="w-full md:w-48 bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2.5 outline-none">
+                                    <option value="all">جميع حسابات الإيراد</option>
+                                    <option value="استشارات">استشارات</option>
+                                    <option value="مبيعات">مبيعات</option>
+                                    <option value="خدمات">خدمات</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button id="applyFiltersBtn" class="w-full md:w-auto bg-blue-900 hover:bg-blue-800 text-white font-medium rounded-lg text-sm px-5 py-2.5 transition text-center flex items-center justify-center gap-2">
+                            <i class="ph ph-funnel"></i>
+                            تطبيق الفلاتر
+                        </button>
+                    </div>
+
+                    <!-- KPI Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                        <div class="card p-4 border-r-4 border-blue-500">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-gray-500 text-sm font-medium">إجمالي المفوتر</h3>
+                                <span class="p-1.5 rounded bg-blue-50 text-blue-600"><i class="ph ph-receipt text-lg"></i></span>
+                            </div>
+                            <div class="text-2xl font-bold text-gray-800 mb-1"><span id="kpi-invoiced">540,200</span> <span class="text-sm font-normal text-gray-500">ر.س</span></div>
+                            <div class="flex items-center text-xs text-green-600 font-medium">
+                                <i class="ph ph-trend-up mr-1"></i>
+                                <span>+12% عن الشهر الماضي</span>
+                            </div>
+                        </div>
+
+                        <div class="card p-4 border-r-4 border-green-500 relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-16 h-16 bg-green-50 rounded-br-full -mt-2 -ml-2 opacity-50"></div>
+                            <div class="flex justify-between items-start mb-2 relative z-10">
+                                <h3 class="text-gray-500 text-sm font-medium">إجمالي المحصل</h3>
+                                <span class="p-1.5 rounded bg-green-50 text-green-600"><i class="ph ph-coins text-lg"></i></span>
+                            </div>
+                            <div class="text-2xl font-bold text-gray-900 mb-1 relative z-10"><span id="kpi-collected">480,500</span> <span class="text-sm font-normal text-gray-500">ر.س</span></div>
+                            <div class="flex items-center text-xs text-green-600 font-medium relative z-10">
+                                <i class="ph ph-check-circle mr-1"></i>
+                                <span>أداء ممتاز</span>
+                            </div>
+                        </div>
+
+                        <div class="card p-4 border-r-4 border-orange-400">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-gray-500 text-sm font-medium">الفجوة (غير محصل)</h3>
+                                <span class="p-1.5 rounded bg-orange-50 text-orange-600"><i class="ph ph-warning-circle text-lg"></i></span>
+                            </div>
+                            <div class="text-2xl font-bold text-gray-800 mb-1"><span id="kpi-gap">59,700</span> <span class="text-sm font-normal text-gray-500">ر.س</span></div>
+                            <div class="flex items-center text-xs text-gray-500">
+                                <span>تمثل 11% من المفوتر</span>
+                            </div>
+                        </div>
+
+                        <div class="card p-4 border-r-4 border-purple-500">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-gray-500 text-sm font-medium">نسبة التحصيل</h3>
+                                <span class="p-1.5 rounded bg-purple-50 text-purple-600"><i class="ph ph-percent text-lg"></i></span>
+                            </div>
+                            <div class="text-2xl font-bold text-gray-800 mb-1"><span id="kpi-collection-rate">89</span>%</div>
+                            <div class="w-full bg-gray-200 rounded-full h-1.5 mt-2">
+                                <div class="bg-purple-500 h-1.5 rounded-full" style="width: 89%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional KPI Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
+                        <div class="card p-4 flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-xs mb-1">المستهدف السنوي</p>
+                                <p class="font-bold text-lg"><span id="kpi-target">1,200,000</span> <span class="text-xs text-gray-400">ر.س</span></p>
+                            </div>
+                            <div class="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
+                                <i class="ph ph-target text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="card p-4 flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-xs mb-1">نسبة تحقيق المستهدف</p>
+                                <p class="font-bold text-lg text-blue-700"><span id="kpi-target-achievement">40</span>%</p>
+                            </div>
+                            <div class="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+                                <i class="ph ph-chart-pie-slice text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="card p-4 flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-xs mb-1">النمو السنوي (YoY)</p>
+                                <p class="font-bold text-lg text-green-600">+<span id="kpi-growth">15</span>% <i class="ph ph-caret-up text-sm"></i></p>
+                            </div>
+                            <div class="h-10 w-10 rounded-full bg-green-50 flex items-center justify-center text-green-600">
+                                <i class="ph ph-chart-line-up text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Grid - Consistent Layout -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
+                        <!-- Chart 1: Monthly Performance -->
+                        <div class="card p-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="font-bold text-gray-800 text-sm">الأداء الشهري: المفوتر vs المحصل</h3>
+                                <button class="text-gray-400 hover:text-blue-900"><i class="ph ph-dots-three-outline text-lg"></i></button>
+                            </div>
+                            <div class="relative h-64 w-full flex items-center justify-center">
+                                <canvas id="mainChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Chart 2: Target Achievement -->
+                        <div class="card p-4 flex flex-col">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="font-bold text-gray-800 text-sm text-right">تحقيق المستهدف</h3>
+                                <button class="text-gray-400 hover:text-blue-900"><i class="ph ph-dots-three-outline text-lg"></i></button>
+                            </div>
+                            <div class="relative h-48 w-full flex items-center justify-center">
+                                <canvas id="targetChart"></canvas>
+                                <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                    <span class="text-3xl font-bold text-gray-800">40%</span>
+                                    <span class="text-xs text-gray-500">من الهدف السنوي</span>
+                                </div>
+                            </div>
+                            <div class="mt-3 w-full">
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span class="text-gray-500">المحصل: 480k</span>
+                                    <span class="text-gray-500">الهدف: 1.2M</span>
+                                </div>
+                                <div class="w-full bg-gray-100 rounded-full h-2">
+                                    <div class="bg-blue-600 h-2 rounded-full" style="width: 40%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chart 3: Accounts Comparison -->
+                        <div class="card p-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="font-bold text-gray-800 text-sm">مقارنة الحسابات</h3>
+                                <button class="text-gray-400 hover:text-blue-900"><i class="ph ph-dots-three-outline text-lg"></i></button>
+                            </div>
+                            <div class="relative h-64 w-full flex items-center justify-center">
+                                <canvas id="accountsComparisonChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Chart 4: Accounts Distribution -->
+                        <div class="card p-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="font-bold text-gray-800 text-sm">توزيع الإيراد حسب الحساب</h3>
+                                <button class="text-gray-400 hover:text-blue-900"><i class="ph ph-dots-three-outline text-lg"></i></button>
+                            </div>
+                            <div class="relative h-64 w-full flex items-center justify-center">
+                                <canvas id="accountsDistributionChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Chart 5: Collection Rate Trend -->
+                        <div class="card p-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="font-bold text-gray-800 text-sm">اتجاه نسبة التحصيل</h3>
+                                <button class="text-gray-400 hover:text-blue-900"><i class="ph ph-dots-three-outline text-lg"></i></button>
+                            </div>
+                            <div class="relative h-64 w-full flex items-center justify-center">
+                                <canvas id="collectionRateChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Chart 6: Stacked Monthly -->
+                        <div class="card p-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="font-bold text-gray-800 text-sm">الإيراد الشهري (مكدس)</h3>
+                                <button class="text-gray-400 hover:text-blue-900"><i class="ph ph-dots-three-outline text-lg"></i></button>
+                            </div>
+                            <div class="relative h-64 w-full flex items-center justify-center">
+                                <canvas id="stackedMonthlyChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Year Comparison Table -->
+                    <div class="card p-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="font-bold text-gray-800 text-sm">مقارنة سريعة بالسنة السابقة (نفس الفترة)</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-right text-gray-500">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 rounded-r-lg cursor-pointer hover:bg-gray-100">المؤشر</th>
+                                        <th scope="col" class="px-6 py-3 cursor-pointer hover:bg-gray-100">السنة الحالية (2025)</th>
+                                        <th scope="col" class="px-6 py-3 cursor-pointer hover:bg-gray-100">السنة السابقة (2024)</th>
+                                        <th scope="col" class="px-6 py-3 rounded-l-lg cursor-pointer hover:bg-gray-100">التغيير</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="bg-white border-b hover:bg-gray-50">
+                                        <td class="px-6 py-4 font-medium text-gray-900">إجمالي المحصل</td>
+                                        <td class="px-6 py-4 font-bold">480,500 ر.س</td>
+                                        <td class="px-6 py-4">410,000 ر.س</td>
+                                        <td class="px-6 py-4 text-green-600 font-bold">+17%</td>
+                                    </tr>
+                                    <tr class="bg-white hover:bg-gray-50">
+                                        <td class="px-6 py-4 font-medium text-gray-900">نسبة التحصيل</td>
+                                        <td class="px-6 py-4 font-bold">89%</td>
+                                        <td class="px-6 py-4">85%</td>
+                                        <td class="px-6 py-4 text-green-600 font-bold">+4%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Page 2: Account Analysis -->
+                <div id="accounts" class="page">
+                    <div class="bg-white p-4 rounded-xl shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
+                        <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+                            <div class="relative w-full md:w-auto">
+                                <select class="w-full md:w-48 bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2.5 outline-none">
+                                    <option>2025</option>
+                                    <option>2024</option>
+                                </select>
+                            </div>
+                            <div class="relative w-full md:w-auto">
+                                <select class="w-full md:w-48 bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2.5 outline-none">
+                                    <option>جميع التبويبات</option>
+                                    <option>منتج</option>
+                                    <option>خدمة</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="w-full md:w-auto bg-blue-900 hover:bg-blue-800 text-white font-medium rounded-lg text-sm px-5 py-2.5 transition">تطبيق</button>
+                    </div>
+
+                    <!-- Charts Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
+                        <div class="card p-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="font-bold text-gray-800 text-sm">أعلى حسابات الإيراد</h3>
+                                <button class="text-gray-400 hover:text-blue-900"><i class="ph ph-dots-three-outline text-lg"></i></button>
+                            </div>
+                            <div class="relative h-64 w-full flex items-center justify-center">
+                                <canvas id="accountsChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="card p-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="font-bold text-gray-800 text-sm">نسبة تحقيق المستهدف</h3>
+                                <button class="text-gray-400 hover:text-blue-900"><i class="ph ph-dots-three-outline text-lg"></i></button>
+                            </div>
+                            <div class="relative h-64 w-full flex items-center justify-center">
+                                <canvas id="accountsTargetChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="card p-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="font-bold text-gray-800 text-sm">مقارنة المفوتر والمحصل</h3>
+                                <button class="text-gray-400 hover:text-blue-900"><i class="ph ph-dots-three-outline text-lg"></i></button>
+                            </div>
+                            <div class="relative h-64 w-full flex items-center justify-center">
+                                <canvas id="accountsBarChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="card p-4 mb-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="font-bold text-gray-800 text-sm">جدول ملخص حسابات الإيراد</h3>
+                            <input type="text" id="accountsSearch" placeholder="بحث عن حساب..." class="bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2.5 outline-none w-64">
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-right">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 cursor-pointer hover:bg-gray-100 sortable">حساب الإيراد</th>
+                                        <th class="px-6 py-3 cursor-pointer hover:bg-gray-100 sortable">المفوتر</th>
+                                        <th class="px-6 py-3 cursor-pointer hover:bg-gray-100 sortable">المحصل</th>
+                                        <th class="px-6 py-3 cursor-pointer hover:bg-gray-100 sortable">نسبة التحصيل</th>
+                                        <th class="px-6 py-3 cursor-pointer hover:bg-gray-100 sortable">المستهدف</th>
+                                        <th class="px-6 py-3 cursor-pointer hover:bg-gray-100 sortable">تحقيق المستهدف</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="accountsTableBody">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Page 3: Tab Analysis -->
+                <div id="tabs" class="page">
+                    <div class="bg-white p-4 rounded-xl shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
+                        <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+                            <div class="relative w-full md:w-auto">
+                                <select class="w-full md:w-48 bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2.5 outline-none">
+                                    <option>2025</option>
+                                </select>
+                            </div>
+                            <div class="relative w-full md:w-auto">
+                                <select class="w-full md:w-48 bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2.5 outline-none">
+                                    <option>جميع الحسابات</option>
+                                    <option>استشارات</option>
+                                    <option>مبيعات</option>
+                                    <option>خدمات</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="w-full md:w-auto bg-blue-900 hover:bg-blue-800 text-white font-medium rounded-lg text-sm px-5 py-2.5 transition">تطبيق</button>
+                    </div>
+
+                    <!-- Charts Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
+                        <div class="card p-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="font-bold text-gray-800 text-sm">توزيع الإيراد حسب التبويب</h3>
+                                <button class="text-gray-400 hover:text-blue-900"><i class="ph ph-dots-three-outline text-lg"></i></button>
+                            </div>
+                            <div class="relative h-64 w-full flex items-center justify-center">
+                                <canvas id="tabsChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="card p-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="font-bold text-gray-800 text-sm">أعلى التبويبات</h3>
+                                <button class="text-gray-400 hover:text-blue-900"><i class="ph ph-dots-three-outline text-lg"></i></button>
+                            </div>
+                            <div class="relative h-64 w-full flex items-center justify-center">
+                                <canvas id="tabsBarChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="card p-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="font-bold text-gray-800 text-sm">الإيراد الشهري حسب التبويب</h3>
+                                <button class="text-gray-400 hover:text-blue-900"><i class="ph ph-dots-three-outline text-lg"></i></button>
+                            </div>
+                            <div class="relative h-64 w-full flex items-center justify-center">
+                                <canvas id="tabsMonthlyChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="card p-4 mb-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="font-bold text-gray-800 text-sm">جدول حسب التبويب</h3>
+                            <input type="text" id="tabsSearch" placeholder="بحث..." class="bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2.5 outline-none w-48">
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-right">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 cursor-pointer hover:bg-gray-100 sortable">التبويب</th>
+                                        <th class="px-6 py-3 cursor-pointer hover:bg-gray-100 sortable">المحصل</th>
+                                        <th class="px-6 py-3 cursor-pointer hover:bg-gray-100 sortable">المفوتر</th>
+                                        <th class="px-6 py-3 cursor-pointer hover:bg-gray-100 sortable">نسبة التحصيل</th>
+                                        <th class="px-6 py-3 cursor-pointer hover:bg-gray-100 sortable">نسبة المشاركة</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabsTableBody">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Page 4: Year Comparison -->
+                <div id="comparison" class="page">
+                    <div class="bg-white p-4 rounded-xl shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
+                        <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+                            <div class="relative w-full md:w-auto">
+                                <select id="comparisonYears" multiple class="w-full md:w-48 bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2.5 outline-none">
+                                    <option value="2025" selected>2025</option>
+                                    <option value="2024" selected>2024</option>
+                                    <option value="2023">2023</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button onclick="updateComparison()" class="w-full md:w-auto bg-blue-900 hover:bg-blue-800 text-white font-medium rounded-lg text-sm px-5 py-2.5 transition">تطبيق</button>
+                    </div>
+
+                    <!-- Charts Grid -->
+                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+                        <div class="card p-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="font-bold text-gray-800 text-sm">مقارنة السنوات</h3>
+                                <button class="text-gray-400 hover:text-blue-900"><i class="ph ph-dots-three-outline text-lg"></i></button>
+                            </div>
+                            <div class="relative h-80 w-full flex items-center justify-center">
+                                <canvas id="comparisonChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="card p-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="font-bold text-gray-800 text-sm">مقارنة بالمستهدف الشهري</h3>
+                                <button class="text-gray-400 hover:text-blue-900"><i class="ph ph-dots-three-outline text-lg"></i></button>
+                            </div>
+                            <div class="relative h-80 w-full flex items-center justify-center">
+                                <canvas id="targetComparisonChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="card p-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="font-bold text-gray-800 text-sm">جدول سنوي مختصر</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-right">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 cursor-pointer hover:bg-gray-100 sortable">السنة</th>
+                                        <th class="px-6 py-3 cursor-pointer hover:bg-gray-100 sortable">المفوتر</th>
+                                        <th class="px-6 py-3 cursor-pointer hover:bg-gray-100 sortable">المحصل</th>
+                                        <th class="px-6 py-3 cursor-pointer hover:bg-gray-100 sortable">المستهدف</th>
+                                        <th class="px-6 py-3 cursor-pointer hover:bg-gray-100 sortable">تحقيق المستهدف</th>
+                                        <th class="px-6 py-3 cursor-pointer hover:bg-gray-100 sortable">النمو</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="yearlyTableBody">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Page 5: Detail Table -->
+                <div id="details" class="page">
+                    <div class="bg-white p-4 rounded-xl shadow-sm mb-6 flex flex-col gap-4">
+                        <div class="flex flex-col md:flex-row gap-3">
+                            <div class="relative w-full md:w-auto">
+                                <select class="w-full md:w-48 bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2.5 outline-none">
+                                    <option>2025</option>
+                                    <option>2024</option>
+                                    <option>2023</option>
+                                </select>
+                            </div>
+                            <div class="relative w-full md:w-auto">
+                                <select class="w-full md:w-48 bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2.5 outline-none">
+                                    <option>جميع الحسابات</option>
+                                    <option>استشارات</option>
+                                    <option>مبيعات</option>
+                                    <option>خدمات</option>
+                                </select>
+                            </div>
+                            <div class="relative w-full md:w-auto">
+                                <select class="w-full md:w-48 bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2.5 outline-none">
+                                    <option>جميع التبويبات</option>
+                                    <option>منتج</option>
+                                    <option>خدمة</option>
+                                    <option>استشارة</option>
+                                </select>
+                            </div>
+                            <div class="relative w-full md:w-auto flex gap-2">
+                                <input type="number" placeholder="من" class="w-full md:w-24 bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2.5 outline-none">
+                                <input type="number" placeholder="إلى" class="w-full md:w-24 bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2.5 outline-none">
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="bg-blue-900 hover:bg-blue-800 text-white font-medium rounded-lg text-sm px-5 py-2.5 transition">تطبيق</button>
+                            <button id="exportExcelBtn" class="bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg text-sm px-5 py-2.5 transition flex items-center gap-2">
+                                <i class="ph ph-download"></i>
+                                تصدير Excel
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card p-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="font-bold text-gray-800 text-sm">جدول البيانات التفصيلية</h3>
+                            <input type="text" id="detailsSearch" placeholder="بحث..." class="bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2.5 outline-none w-64">
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-right" id="detailsTable">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 cursor-pointer hover:bg-gray-100 sortable">تاريخ الحركة</th>
+                                        <th class="px-6 py-3 cursor-pointer hover:bg-gray-100 sortable">السنة</th>
+                                        <th class="px-6 py-3 cursor-pointer hover:bg-gray-100 sortable">الشهر</th>
+                                        <th class="px-6 py-3 cursor-pointer hover:bg-gray-100 sortable">حساب الإيراد</th>
+                                        <th class="px-6 py-3 cursor-pointer hover:bg-gray-100 sortable">التبويب</th>
+                                        <th class="px-6 py-3 cursor-pointer hover:bg-gray-100 sortable">المفوتر</th>
+                                        <th class="px-6 py-3 cursor-pointer hover:bg-gray-100 sortable">المحصل</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="detailsTableBody">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-4 flex justify-between items-center">
+                            <div class="text-sm text-gray-500">عرض 1-10 من 150</div>
+                            <div class="flex gap-2">
+                                <button id="prevPageBtn" class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50">السابق</button>
+                                <button id="nextPageBtn" class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50">التالي</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenuOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden"></div>
+    <aside id="mobileSidebar" class="fixed top-0 right-0 z-40 w-64 h-screen transition-transform translate-x-full bg-white border-l border-gray-200 lg:hidden">
+        <div class="p-6 flex items-center justify-between border-b border-gray-100">
+            <div class="text-xl font-bold text-blue-900 flex items-center gap-2">
+                <i class="ph ph-chart-polar"></i>
+                <span>إيراداتي</span>
+            </div>
+            <button id="closeMobileMenu" class="text-gray-500"><i class="ph ph-x text-xl"></i></button>
+        </div>
+        <nav class="p-4 space-y-2">
+            <a href="#" onclick="showPage('overview'); toggleMobileMenu(); return false;" class="flex items-center gap-3 p-3 text-blue-900 bg-blue-50 rounded-lg font-bold">ملخص الإيرادات</a>
+            <a href="#" onclick="showPage('accounts'); toggleMobileMenu(); return false;" class="flex items-center gap-3 p-3 text-gray-500">تحليل الحسابات</a>
+            <a href="#" onclick="showPage('tabs'); toggleMobileMenu(); return false;" class="flex items-center gap-3 p-3 text-gray-500">تحليل التبويب</a>
+            <a href="#" onclick="showPage('comparison'); toggleMobileMenu(); return false;" class="flex items-center gap-3 p-3 text-gray-500">مقارنة السنوات</a>
+            <a href="#" onclick="showPage('details'); toggleMobileMenu(); return false;" class="flex items-center gap-3 p-3 text-gray-500">الجدول التفصيلي</a>
+        </nav>
+    </aside>
+
+    <script>
+        // ============================================
+        // DATA SERVICE - Connect to your API/Data Source
+        // ============================================
+        const DataService = {
+            // Configure your API endpoint here
+            API_BASE_URL: 'https://your-api.com/api', // Change this to your API URL
+            
+            // For demo: using dummy data, replace with actual API call
+            async fetchRevenueData(filters = {}) {
+                try {
+                    // Uncomment below to use real API:
+                    // const params = new URLSearchParams(filters);
+                    // const response = await fetch(`${this.API_BASE_URL}/revenue?${params}`);
+                    // const data = await response.json();
+                    // return data;
+                    
+                    // For now, return dummy data with delay to simulate API call
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    return this.getDummyData(filters);
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                    showErrorMessage('حدث خطأ في تحميل البيانات');
+                    return null;
+                }
+            },
+            
+            getDummyData(filters) {
+                // Return filtered dummy data based on filters
+                return {
+                    monthly: {
+                        labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
+                        invoiced: [70000, 62000, 85000, 90000, 60000, 100000],
+                        collected: [65000, 59000, 80000, 81000, 56000, 95000]
+                    },
+                    accounts: [
+                        { name: 'استشارات', invoiced: 250000, collected: 230000, target: 300000 },
+                        { name: 'مبيعات', invoiced: 180000, collected: 165000, target: 200000 },
+                        { name: 'خدمات', invoiced: 110200, collected: 85500, target: 150000 }
+                    ],
+                    tabs: [
+                        { name: 'منتج', collected: 200000, invoiced: 220000, percentage: 42 },
+                        { name: 'خدمة', collected: 150000, invoiced: 160000, percentage: 31 },
+                        { name: 'استشارة', collected: 100000, invoiced: 110000, percentage: 21 },
+                        { name: 'أخرى', collected: 30500, invoiced: 50200, percentage: 6 }
+                    ],
+                    yearly: [
+                        { year: 2025, invoiced: 540200, collected: 480500, target: 1200000, achievement: 40, growth: 15 },
+                        { year: 2024, invoiced: 480000, collected: 410000, target: 1100000, achievement: 37, growth: 12 },
+                        { year: 2023, invoiced: 420000, collected: 365000, target: 1000000, achievement: 37, growth: 8 }
+                    ],
+                    details: [
+                        { date: '2025-01-15', year: 2025, month: 'يناير', account: 'استشارات', tab: 'خدمة', invoiced: 15000, collected: 14000 },
+                        { date: '2025-01-20', year: 2025, month: 'يناير', account: 'مبيعات', tab: 'منتج', invoiced: 25000, collected: 23000 },
+                        { date: '2025-02-10', year: 2025, month: 'فبراير', account: 'استشارات', tab: 'استشارة', invoiced: 18000, collected: 17000 },
+                        { date: '2025-02-25', year: 2025, month: 'فبراير', account: 'خدمات', tab: 'خدمة', invoiced: 12000, collected: 11000 },
+                        { date: '2025-03-05', year: 2025, month: 'مارس', account: 'مبيعات', tab: 'منتج', invoiced: 30000, collected: 28000 },
+                        { date: '2025-03-18', year: 2025, month: 'مارس', account: 'استشارات', tab: 'خدمة', invoiced: 22000, collected: 21000 },
+                        { date: '2025-04-12', year: 2025, month: 'أبريل', account: 'مبيعات', tab: 'منتج', invoiced: 35000, collected: 33000 },
+                        { date: '2025-04-28', year: 2025, month: 'أبريل', account: 'خدمات', tab: 'أخرى', invoiced: 15000, collected: 14000 },
+                        { date: '2025-05-08', year: 2025, month: 'مايو', account: 'استشارات', tab: 'استشارة', invoiced: 20000, collected: 18000 },
+                        { date: '2025-06-15', year: 2025, month: 'يونيو', account: 'مبيعات', tab: 'منتج', invoiced: 40000, collected: 38000 }
+                    ]
+                };
+            }
+        };
+
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
+        function showErrorMessage(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast bg-red-500 text-white';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 5000);
+        }
+
+        function showSuccessMessage(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast bg-green-500 text-white';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function showLoadingState() {
+            document.querySelectorAll('.card canvas').forEach(canvas => {
+                if (!canvas.parentElement.querySelector('.loading-spinner')) {
+                    const spinner = document.createElement('div');
+                    spinner.className = 'loading-spinner';
+                    spinner.innerHTML = '<i class="ph ph-spinner text-2xl text-blue-600"></i>';
+                    canvas.parentElement.appendChild(spinner);
+                }
+            });
+        }
+
+        function hideLoadingState() {
+            document.querySelectorAll('.loading-spinner').forEach(spinner => spinner.remove());
+        }
+
+        // ============================================
+        // FILTER FUNCTIONALITY
+        // ============================================
+        async function applyFilters() {
+            if (!validateFilters()) return;
+            
+            showLoadingState();
+            
+            const filters = {
+                year: document.getElementById('filterYear').value,
+                monthRange: document.getElementById('filterMonthRange').value,
+                account: document.getElementById('filterAccount').value === 'all' ? null : document.getElementById('filterAccount').value
+            };
+            
+            try {
+                const data = await DataService.fetchRevenueData(filters);
+                if (data) {
+                    updateKPIs(data);
+                    updateCharts(data);
+                    saveUserPreferences();
+                }
+            } catch (error) {
+                showErrorMessage('حدث خطأ في تطبيق الفلاتر');
+            } finally {
+                hideLoadingState();
+            }
+        }
+
+        function validateFilters() {
+            const year = document.getElementById('filterYear').value;
+            if (!year || year < 2020 || year > 2030) {
+                showErrorMessage('يرجى اختيار سنة صحيحة');
+                return false;
+            }
+            return true;
+        }
+
+        function getCurrentFilters() {
+            return {
+                year: document.getElementById('filterYear').value,
+                monthRange: document.getElementById('filterMonthRange').value,
+                account: document.getElementById('filterAccount').value
+            };
+        }
+
+        // ============================================
+        // SEARCH FUNCTIONALITY
+        // ============================================
+        function setupSearch() {
+            // Global search
+            const globalSearch = document.getElementById('globalSearch');
+            if (globalSearch) {
+                globalSearch.addEventListener('input', (e) => {
+                    const term = e.target.value.toLowerCase();
+                    document.querySelectorAll('table tbody tr').forEach(row => {
+                        const text = row.textContent.toLowerCase();
+                        row.style.display = text.includes(term) ? '' : 'none';
+                    });
+                });
+            }
+
+            // Table-specific searches
+            ['accountsSearch', 'tabsSearch', 'detailsSearch'].forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener('input', (e) => {
+                        const term = e.target.value.toLowerCase();
+                        const table = e.target.closest('.card').querySelector('table tbody');
+                        if (table) {
+                            table.querySelectorAll('tr').forEach(row => {
+                                const text = row.textContent.toLowerCase();
+                                row.style.display = text.includes(term) ? '' : 'none';
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        // ============================================
+        // TABLE SORTING
+        // ============================================
+        function setupTableSorting() {
+            document.querySelectorAll('.sortable').forEach(header => {
+                header.addEventListener('click', () => {
+                    const table = header.closest('table');
+                    const columnIndex = Array.from(header.parentElement.children).indexOf(header);
+                    const isAsc = header.classList.contains('sort-asc');
+                    
+                    // Remove all sort classes
+                    header.parentElement.querySelectorAll('.sort-asc, .sort-desc').forEach(h => {
+                        h.classList.remove('sort-asc', 'sort-desc');
+                    });
+                    
+                    // Add sort class
+                    header.classList.add(isAsc ? 'sort-desc' : 'sort-asc');
+                    
+                    sortTable(table, columnIndex, !isAsc);
+                });
+            });
+        }
+
+        function sortTable(table, columnIndex, ascending = true) {
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            
+            rows.sort((a, b) => {
+                const aText = a.children[columnIndex].textContent.trim();
+                const bText = b.children[columnIndex].textContent.trim();
+                
+                // Try to parse as numbers
+                const aNum = parseFloat(aText.replace(/[^\d.-]/g, ''));
+                const bNum = parseFloat(bText.replace(/[^\d.-]/g, ''));
+                
+                if (!isNaN(aNum) && !isNaN(bNum)) {
+                    return ascending ? aNum - bNum : bNum - aNum;
+                }
+                
+                return ascending 
+                    ? aText.localeCompare(bText, 'ar')
+                    : bText.localeCompare(aText, 'ar');
+            });
+            
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        // ============================================
+        // EXPORT FUNCTIONALITY
+        // ============================================
+        function setupExport() {
+            const exportBtn = document.getElementById('exportExcelBtn');
+            if (exportBtn) {
+                exportBtn.addEventListener('click', () => {
+                    const table = document.getElementById('detailsTable');
+                    if (table) {
+                        const wb = XLSX.utils.table_to_book(table);
+                        XLSX.writeFile(wb, `revenue-details-${new Date().toISOString().split('T')[0]}.xlsx`);
+                        showSuccessMessage('تم تصدير البيانات بنجاح');
+                    }
+                });
+            }
+        }
+
+        // ============================================
+        // USER PREFERENCES (LocalStorage)
+        // ============================================
+        function saveUserPreferences() {
+            const preferences = {
+                defaultYear: document.getElementById('filterYear').value,
+                defaultAccount: document.getElementById('filterAccount').value,
+                lastUpdate: Date.now()
+            };
+            localStorage.setItem('dashboardPreferences', JSON.stringify(preferences));
+        }
+
+        function loadUserPreferences() {
+            const saved = localStorage.getItem('dashboardPreferences');
+            if (saved) {
+                try {
+                    const preferences = JSON.parse(saved);
+                    if (preferences.defaultYear) {
+                        document.getElementById('filterYear').value = preferences.defaultYear;
+                    }
+                    if (preferences.defaultAccount) {
+                        document.getElementById('filterAccount').value = preferences.defaultAccount;
+                    }
+                } catch (e) {
+                    console.error('Error loading preferences:', e);
+                }
+            }
+        }
+
+        // ============================================
+        // DATA CACHING
+        // ============================================
+        const dataCache = new Map();
+        const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+        async function fetchRevenueDataCached(filters) {
+            const cacheKey = JSON.stringify(filters);
+            
+            if (dataCache.has(cacheKey)) {
+                const cached = dataCache.get(cacheKey);
+                if (Date.now() - cached.timestamp < CACHE_DURATION) {
+                    return cached.data;
+                }
+            }
+            
+            const data = await DataService.fetchRevenueData(filters);
+            if (data) {
+                dataCache.set(cacheKey, {
+                    data: data,
+                    timestamp: Date.now()
+                });
+            }
+            
+            return data;
+        }
+
+        // ============================================
+        // UPDATE FUNCTIONS
+        // ============================================
+        function updateKPIs(data) {
+            if (!data) return;
+            
+            const totalInvoiced = data.accounts.reduce((sum, acc) => sum + acc.invoiced, 0);
+            const totalCollected = data.accounts.reduce((sum, acc) => sum + acc.collected, 0);
+            const gap = totalInvoiced - totalCollected;
+            const collectionRate = Math.round((totalCollected / totalInvoiced) * 100);
+            
+            document.getElementById('kpi-invoiced').textContent = totalInvoiced.toLocaleString();
+            document.getElementById('kpi-collected').textContent = totalCollected.toLocaleString();
+            document.getElementById('kpi-gap').textContent = gap.toLocaleString();
+            document.getElementById('kpi-collection-rate').textContent = collectionRate;
+            
+            // Update progress bar
+            const progressBar = document.querySelector('.bg-purple-500.h-1.5.rounded-full');
+            if (progressBar) {
+                progressBar.style.width = collectionRate + '%';
+            }
+        }
+
+        function updateCharts(data) {
+            if (!data) return;
+            
+            // Reinitialize charts with new data
+            if (document.getElementById('overview').classList.contains('active')) {
+                initOverviewCharts(data);
+            } else if (document.getElementById('accounts').classList.contains('active')) {
+                initAccountsPage(data);
+            } else if (document.getElementById('tabs').classList.contains('active')) {
+                initTabsPage(data);
+            } else if (document.getElementById('comparison').classList.contains('active')) {
+                initComparisonPage(data);
+            }
+        }
+
+        function updateTables(data) {
+            if (!data) return;
+            
+            if (document.getElementById('accounts').classList.contains('active')) {
+                initAccountsPage(data);
+            } else if (document.getElementById('tabs').classList.contains('active')) {
+                initTabsPage(data);
+            } else if (document.getElementById('details').classList.contains('active')) {
+                initDetailsPage(data);
+            }
+        }
+
+        // ============================================
+        // REFRESH FUNCTIONALITY
+        // ============================================
+        function setupRefresh() {
+            const refreshBtn = document.getElementById('refreshBtn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', async () => {
+                    refreshBtn.classList.add('animate-spin');
+                    // Clear cache
+                    dataCache.clear();
+                    await applyFilters();
+                    refreshBtn.classList.remove('animate-spin');
+                    showSuccessMessage('تم تحديث البيانات');
+                });
+            }
+        }
+
+        // ============================================
+        // PAGE NAVIGATION
+        // ============================================
+        const pageTitles = {
+            'overview': 'ملخص الإيرادات',
+            'accounts': 'تحليل حسب حساب الإيراد',
+            'tabs': 'تحليل حسب التبويب',
+            'comparison': 'مقارنة السنوات والمستهدف',
+            'details': 'الجدول التفصيلي'
+        };
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            document.getElementById('pageTitle').textContent = pageTitles[pageId];
+            
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active', 'bg-blue-900', 'text-white');
+                item.classList.add('text-gray-500');
+            });
+            
+            const clickedItem = event.target.closest('.nav-item');
+            if (clickedItem) {
+                clickedItem.classList.add('active', 'bg-blue-900', 'text-white');
+                clickedItem.classList.remove('text-gray-500');
+            }
+            
+            // Load data for the page
+            loadPageData(pageId);
+        }
+
+        async function loadPageData(pageId) {
+            const filters = getCurrentFilters();
+            const data = await fetchRevenueDataCached(filters);
+            
+            if (data) {
+                if (pageId === 'overview') {
+                    initOverviewCharts(data);
+                } else if (pageId === 'accounts') {
+                    initAccountsPage(data);
+                } else if (pageId === 'tabs') {
+                    initTabsPage(data);
+                } else if (pageId === 'comparison') {
+                    initComparisonPage(data);
+                } else if (pageId === 'details') {
+                    initDetailsPage(data);
+                }
+            }
+        }
+
+        // ============================================
+        // MOBILE MENU
+        // ============================================
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('mobileSidebar');
+            const overlay = document.getElementById('mobileMenuOverlay');
+            const isClosed = sidebar.classList.contains('translate-x-full');
+            if (isClosed) {
+                sidebar.classList.remove('translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        document.getElementById('mobileMenuBtn').addEventListener('click', toggleMobileMenu);
+        document.getElementById('closeMobileMenu').addEventListener('click', toggleMobileMenu);
+        document.getElementById('mobileMenuOverlay').addEventListener('click', toggleMobileMenu);
+
+        // ============================================
+        // CHARTS INITIALIZATION
+        // ============================================
+        let mainChart, targetChart, accountsChart, tabsChart, comparisonChart, targetComparisonChart;
+        let accountsComparisonChart, accountsDistributionChart, collectionRateChart, stackedMonthlyChart;
+        let accountsTargetChart, accountsBarChart, tabsBarChart, tabsMonthlyChart;
+
+        function initOverviewCharts(data) {
+            if (!data) data = DataService.getDummyData();
+            
+            // Main Chart
+            const ctxMain = document.getElementById('mainChart');
+            if (mainChart) mainChart.destroy();
+            mainChart = new Chart(ctxMain, {
+                type: 'line',
+                data: {
+                    labels: data.monthly.labels,
+                    datasets: [
+                        {
+                            label: 'المحصل',
+                            data: data.monthly.collected,
+                            borderColor: '#10B981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'المفوتر',
+                            data: data.monthly.invoiced,
+                            borderColor: '#3B82F6',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0.4,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            align: 'end',
+                            labels: { font: { family: 'Cairo' }, usePointStyle: true }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.parsed.y.toLocaleString()} ر.س`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { borderDash: [2, 4] } },
+                        x: { grid: { display: false } }
+                    },
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const month = data.monthly.labels[elements[0].index];
+                            showSuccessMessage(`تم اختيار شهر: ${month}`);
+                        }
+                    }
+                }
+            });
+
+            // Target Chart
+            const ctxTarget = document.getElementById('targetChart');
+            if (targetChart) targetChart.destroy();
+            targetChart = new Chart(ctxTarget, {
+                type: 'doughnut',
+                data: {
+                    labels: ['محقق', 'متبقي'],
+                    datasets: [{
+                        data: [40, 60],
+                        backgroundColor: ['#2563EB', '#F3F4F6'],
+                        borderWidth: 0,
+                        cutout: '75%'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } }
+                }
+            });
+
+            // Accounts Comparison Chart
+            const ctxAccComp = document.getElementById('accountsComparisonChart');
+            if (accountsComparisonChart) accountsComparisonChart.destroy();
+            accountsComparisonChart = new Chart(ctxAccComp, {
+                type: 'bar',
+                data: {
+                    labels: data.accounts.map(a => a.name),
+                    datasets: [
+                        {
+                            label: 'المفوتر',
+                            data: data.accounts.map(a => a.invoiced),
+                            backgroundColor: '#3B82F6',
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'المحصل',
+                            data: data.accounts.map(a => a.collected),
+                            backgroundColor: '#10B981',
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', align: 'end' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true },
+                        x: { grid: { display: false } }
+                    },
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const accountName = data.accounts[elements[0].index].name;
+                            document.getElementById('filterAccount').value = accountName;
+                            applyFilters();
+                        }
+                    }
+                }
+            });
+
+            // Accounts Distribution Chart
+            const ctxAccDist = document.getElementById('accountsDistributionChart');
+            if (accountsDistributionChart) accountsDistributionChart.destroy();
+            accountsDistributionChart = new Chart(ctxAccDist, {
+                type: 'pie',
+                data: {
+                    labels: data.accounts.map(a => a.name),
+                    datasets: [{
+                        data: data.accounts.map(a => a.collected),
+                        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B'],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    },
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const accountName = data.accounts[elements[0].index].name;
+                            document.getElementById('filterAccount').value = accountName;
+                            applyFilters();
+                        }
+                    }
+                }
+            });
+
+            // Collection Rate Chart
+            const ctxCollRate = document.getElementById('collectionRateChart');
+            if (collectionRateChart) collectionRateChart.destroy();
+            const collectionRates = data.monthly.labels.map((_, i) => 
+                Math.round((data.monthly.collected[i] / data.monthly.invoiced[i]) * 100)
+            );
+            collectionRateChart = new Chart(ctxCollRate, {
+                type: 'line',
+                data: {
+                    labels: data.monthly.labels,
+                    datasets: [{
+                        label: 'نسبة التحصيل %',
+                        data: collectionRates,
+                        borderColor: '#8B5CF6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#8B5CF6'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: false,
+                            min: 80,
+                            max: 100,
+                            ticks: { suffix: '%' }
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Stacked Monthly Chart
+            const ctxStacked = document.getElementById('stackedMonthlyChart');
+            if (stackedMonthlyChart) stackedMonthlyChart.destroy();
+            stackedMonthlyChart = new Chart(ctxStacked, {
+                type: 'bar',
+                data: {
+                    labels: data.monthly.labels,
+                    datasets: [
+                        {
+                            label: 'استشارات',
+                            data: [20000, 18000, 25000, 28000, 20000, 30000],
+                            backgroundColor: '#3B82F6'
+                        },
+                        {
+                            label: 'مبيعات',
+                            data: [25000, 22000, 30000, 32000, 20000, 40000],
+                            backgroundColor: '#10B981'
+                        },
+                        {
+                            label: 'خدمات',
+                            data: [20000, 19000, 25000, 21000, 16000, 25000],
+                            backgroundColor: '#F59E0B'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', align: 'end' }
+                    },
+                    scales: {
+                        x: { stacked: true, grid: { display: false } },
+                        y: { stacked: true, beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        function initAccountsPage(data) {
+            if (!data) data = DataService.getDummyData();
+            
+            // Populate accounts table
+            const tbody = document.getElementById('accountsTableBody');
+            tbody.innerHTML = data.accounts.map(acc => {
+                const rate = Math.round((acc.collected / acc.invoiced) * 100);
+                const targetRate = Math.round((acc.collected / acc.target) * 100);
+                return `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="px-6 py-4 font-medium">${acc.name}</td>
+                        <td class="px-6 py-4">${acc.invoiced.toLocaleString()} ر.س</td>
+                        <td class="px-6 py-4 font-bold">${acc.collected.toLocaleString()} ر.س</td>
+                        <td class="px-6 py-4">${rate}%</td>
+                        <td class="px-6 py-4">${acc.target.toLocaleString()} ر.س</td>
+                        <td class="px-6 py-4">${targetRate}%</td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Accounts Chart
+            const ctx = document.getElementById('accountsChart');
+            if (accountsChart) accountsChart.destroy();
+            accountsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.accounts.map(a => a.name),
+                    datasets: [{
+                        label: 'المحصل',
+                        data: data.accounts.map(a => a.collected),
+                        backgroundColor: '#3B82F6',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Accounts Target Chart
+            const ctxTarget = document.getElementById('accountsTargetChart');
+            if (accountsTargetChart) accountsTargetChart.destroy();
+            const targetRates = data.accounts.map(a => Math.round((a.collected / a.target) * 100));
+            accountsTargetChart = new Chart(ctxTarget, {
+                type: 'bar',
+                data: {
+                    labels: data.accounts.map(a => a.name),
+                    datasets: [{
+                        label: 'نسبة التحقيق %',
+                        data: targetRates,
+                        backgroundColor: ['#10B981', '#3B82F6', '#F59E0B'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { suffix: '%' }
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Accounts Bar Chart
+            const ctxBar = document.getElementById('accountsBarChart');
+            if (accountsBarChart) accountsBarChart.destroy();
+            accountsBarChart = new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: data.accounts.map(a => a.name),
+                    datasets: [
+                        {
+                            label: 'المفوتر',
+                            data: data.accounts.map(a => a.invoiced),
+                            backgroundColor: '#94A3B8',
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'المحصل',
+                            data: data.accounts.map(a => a.collected),
+                            backgroundColor: '#10B981',
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', align: 'end' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function initTabsPage(data) {
+            if (!data) data = DataService.getDummyData();
+            
+            // Populate tabs table
+            const tbody = document.getElementById('tabsTableBody');
+            tbody.innerHTML = data.tabs.map(tab => {
+                const rate = Math.round((tab.collected / tab.invoiced) * 100);
+                return `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="px-6 py-4 font-medium">${tab.name}</td>
+                        <td class="px-6 py-4 font-bold">${tab.collected.toLocaleString()} ر.س</td>
+                        <td class="px-6 py-4">${tab.invoiced.toLocaleString()} ر.س</td>
+                        <td class="px-6 py-4">${rate}%</td>
+                        <td class="px-6 py-4">${tab.percentage}%</td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Tabs Chart
+            const ctx = document.getElementById('tabsChart');
+            if (tabsChart) tabsChart.destroy();
+            tabsChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.tabs.map(t => t.name),
+                    datasets: [{
+                        data: data.tabs.map(t => t.collected),
+                        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+
+            // Tabs Bar Chart
+            const ctxBar = document.getElementById('tabsBarChart');
+            if (tabsBarChart) tabsBarChart.destroy();
+            tabsBarChart = new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: data.tabs.map(t => t.name),
+                    datasets: [{
+                        label: 'المحصل',
+                        data: data.tabs.map(t => t.collected),
+                        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: { beginAtZero: true },
+                        y: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Tabs Monthly Chart
+            const ctxMonthly = document.getElementById('tabsMonthlyChart');
+            if (tabsMonthlyChart) tabsMonthlyChart.destroy();
+            tabsMonthlyChart = new Chart(ctxMonthly, {
+                type: 'line',
+                data: {
+                    labels: data.monthly.labels,
+                    datasets: [
+                        {
+                            label: 'منتج',
+                            data: [35000, 32000, 40000, 42000, 30000, 50000],
+                            borderColor: '#3B82F6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'خدمة',
+                            data: [20000, 18000, 25000, 24000, 18000, 28000],
+                            borderColor: '#10B981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'استشارة',
+                            data: [10000, 9000, 15000, 15000, 8000, 17000],
+                            borderColor: '#F59E0B',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', align: 'end' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function initComparisonPage(data) {
+            if (!data) data = DataService.getDummyData();
+            
+            // Yearly table
+            const tbody = document.getElementById('yearlyTableBody');
+            tbody.innerHTML = data.yearly.map(y => `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="px-6 py-4 font-medium">${y.year}</td>
+                    <td class="px-6 py-4">${y.invoiced.toLocaleString()} ر.س</td>
+                    <td class="px-6 py-4 font-bold">${y.collected.toLocaleString()} ر.س</td>
+                    <td class="px-6 py-4">${y.target.toLocaleString()} ر.س</td>
+                    <td class="px-6 py-4">${y.achievement}%</td>
+                    <td class="px-6 py-4 text-green-600">+${y.growth}%</td>
+                </tr>
+            `).join('');
+
+            // Comparison Chart
+            const ctx = document.getElementById('comparisonChart');
+            if (comparisonChart) comparisonChart.destroy();
+            const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+            comparisonChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: '2025',
+                            data: [65, 59, 80, 81, 56, 95, 70, 75, 85, 90, 88, 92],
+                            borderColor: '#3B82F6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: '2024',
+                            data: [55, 50, 70, 72, 48, 82, 60, 65, 75, 80, 78, 85],
+                            borderColor: '#10B981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', align: 'end' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Target Comparison Chart
+            const ctxTarget = document.getElementById('targetComparisonChart');
+            if (targetComparisonChart) targetComparisonChart.destroy();
+            targetComparisonChart = new Chart(ctxTarget, {
+                type: 'bar',
+                data: {
+                    labels: months.slice(0, 6),
+                    datasets: [
+                        {
+                            label: 'المستهدف',
+                            data: [100, 100, 100, 100, 100, 100],
+                            backgroundColor: '#94A3B8'
+                        },
+                        {
+                            label: 'الفعلي',
+                            data: [65, 59, 80, 81, 56, 95],
+                            backgroundColor: '#3B82F6'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', align: 'end' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        function initDetailsPage(data) {
+            if (!data) data = DataService.getDummyData();
+            
+            const tbody = document.getElementById('detailsTableBody');
+            tbody.innerHTML = data.details.map(d => `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="px-6 py-4">${d.date}</td>
+                    <td class="px-6 py-4">${d.year}</td>
+                    <td class="px-6 py-4">${d.month}</td>
+                    <td class="px-6 py-4">${d.account}</td>
+                    <td class="px-6 py-4">${d.tab}</td>
+                    <td class="px-6 py-4">${d.invoiced.toLocaleString()} ر.س</td>
+                    <td class="px-6 py-4 font-bold">${d.collected.toLocaleString()} ر.س</td>
+                </tr>
+            `).join('');
+        }
+
+        function updateComparison() {
+            initComparisonPage();
+        }
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load user preferences
+            loadUserPreferences();
+            
+            // Setup interactive features
+            setupSearch();
+            setupTableSorting();
+            setupExport();
+            setupRefresh();
+            
+            // Connect filter button
+            document.getElementById('applyFiltersBtn').addEventListener('click', applyFilters);
+            
+            // Initialize charts with dummy data
+            const initialData = DataService.getDummyData();
+            initOverviewCharts(initialData);
+            updateKPIs(initialData);
+            
+            // Auto-refresh every 5 minutes (optional)
+            // setInterval(() => {
+            //     applyFilters();
+            // }, 5 * 60 * 1000);
+        });
+    </script>
+</body>
+</html>
