@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>داشبورد الإيرادات | حيوي متكامل</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body { font-family: 'Cairo', sans-serif; background-color: #FAF5FF; }
+        .card { background-color: white; border-radius: 20px; box-shadow: 0 10px 30px -10px rgba(124, 58, 237, 0.1); border: 1px solid #F3E8FF; }
+    </style>
+</head>
+<body class="text-gray-800 bg-purple-50/50">
+
+    <div class="flex min-h-screen">
+        <aside class="hidden lg:flex flex-col w-72 bg-white h-screen sticky top-0 border-l border-purple-100 p-6">
+            <div class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-10 flex items-center gap-2">
+                <i class="ph ph-lightning-fill text-amber-500"></i> FLASH
+            </div>
+            <div class="space-y-2">
+                <div class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-4 rounded-2xl shadow-lg shadow-purple-500/30 flex items-center gap-3 font-bold cursor-pointer transform hover:scale-105 transition">
+                    <i class="ph ph-squares-four text-xl"></i> الرئيسي
+                </div>
+                <div class="hover:bg-purple-50 text-gray-600 p-4 rounded-2xl flex items-center gap-3 cursor-pointer transition font-medium">
+                    <i class="ph ph-chart-pie-slice text-xl"></i> التحليلات
+                </div>
+                <div class="hover:bg-purple-50 text-gray-600 p-4 rounded-2xl flex items-center gap-3 cursor-pointer transition font-medium">
+                    <i class="ph ph-users text-xl"></i> العملاء
+                </div>
+            </div>
+            
+            <div class="mt-auto bg-amber-50 p-4 rounded-2xl border border-amber-100">
+                <p class="text-amber-800 font-bold text-sm mb-1">الهدف الشهري</p>
+                <div class="w-full bg-amber-200 h-2 rounded-full mb-2"><div class="bg-amber-500 h-2 rounded-full" style="width: 70%"></div></div>
+                <p class="text-xs text-amber-600">حققت 70% من الهدف!</p>
+            </div>
+        </aside>
+
+        <main class="flex-1 p-8 overflow-y-auto h-screen">
+            <div class="flex justify-between items-end mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">أهلاً، محمد 👋</h1>
+                    <p class="text-gray-500">إليك ملخص الأداء المالي لهذا الأسبوع</p>
+                </div>
+                <button class="bg-white border border-purple-200 text-purple-700 px-4 py-2 rounded-xl font-bold shadow-sm hover:bg-purple-50 transition flex items-center gap-2">
+                    <i class="ph ph-download-simple"></i> تقرير PDF
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="card p-6 border-b-4 border-b-purple-500 hover:-translate-y-1 transition-transform">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-3 bg-purple-100 text-purple-600 rounded-2xl"><i class="ph ph-wallet text-2xl"></i></div>
+                        <span class="text-green-500 font-bold text-sm bg-green-50 px-2 py-1 rounded-lg">+12%</span>
+                    </div>
+                    <div class="text-3xl font-bold text-gray-900">240k</div>
+                    <div class="text-gray-400 text-sm mt-1">إيرادات الأسبوع</div>
+                </div>
+                <div class="card p-6 border-b-4 border-b-pink-500 hover:-translate-y-1 transition-transform">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-3 bg-pink-100 text-pink-600 rounded-2xl"><i class="ph ph-shopping-cart text-2xl"></i></div>
+                        <span class="text-green-500 font-bold text-sm bg-green-50 px-2 py-1 rounded-lg">+5%</span>
+                    </div>
+                    <div class="text-3xl font-bold text-gray-900">1,250</div>
+                    <div class="text-gray-400 text-sm mt-1">طلبات جديدة</div>
+                </div>
+                <div class="card p-6 border-b-4 border-b-amber-500 hover:-translate-y-1 transition-transform">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-3 bg-amber-100 text-amber-600 rounded-2xl"><i class="ph ph-star text-2xl"></i></div>
+                        <span class="text-gray-400 text-sm">ثابت</span>
+                    </div>
+                    <div class="text-3xl font-bold text-gray-900">4.8</div>
+                    <div class="text-gray-400 text-sm mt-1">تقييم العملاء</div>
+                </div>
+                <div class="card p-6 border-b-4 border-b-indigo-500 hover:-translate-y-1 transition-transform">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-3 bg-indigo-100 text-indigo-600 rounded-2xl"><i class="ph ph-users-three text-2xl"></i></div>
+                        <span class="text-red-500 font-bold text-sm bg-red-50 px-2 py-1 rounded-lg">-2%</span>
+                    </div>
+                    <div class="text-3xl font-bold text-gray-900">850</div>
+                    <div class="text-gray-400 text-sm mt-1">زوار نشطون</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <div class="card p-8 lg:col-span-2">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-gray-800">تحليل المبيعات</h3>
+                        <div class="flex gap-2">
+                            <button class="px-3 py-1 bg-purple-100 text-purple-700 rounded-lg text-sm font-bold">شهري</button>
+                            <button class="px-3 py-1 text-gray-400 hover:bg-gray-50 rounded-lg text-sm">سنوي</button>
+                        </div>
+                    </div>
+                    <div class="h-80"><canvas id="salesChart"></canvas></div>
+                </div>
+
+                <div class="card p-8 flex flex-col items-center">
+                    <h3 class="text-xl font-bold text-gray-800 mb-6 w-full text-right">فئات المنتجات</h3>
+                    <div class="w-full h-64"><canvas id="polarChart"></canvas></div>
+                    <div class="mt-6 flex flex-wrap justify-center gap-2">
+                        <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs font-bold">إلكترونيات</span>
+                        <span class="px-2 py-1 bg-pink-100 text-pink-700 rounded text-xs font-bold">أزياء</span>
+                        <span class="px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs font-bold">منزل</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="card p-0 lg:col-span-2 overflow-hidden">
+                    <div class="p-6 border-b border-gray-100 flex justify-between">
+                        <h3 class="font-bold text-lg">أحدث المعاملات</h3>
+                        <a href="#" class="text-purple-600 text-sm font-bold hover:underline">عرض الكل</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right">
+                            <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+                                <tr>
+                                    <th class="px-6 py-4">المعرف</th>
+                                    <th class="px-6 py-4">العميل</th>
+                                    <th class="px-6 py-4">المبلغ</th>
+                                    <th class="px-6 py-4">الحالة</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                <tr class="hover:bg-purple-50/30 transition cursor-pointer">
+                                    <td class="px-6 py-4 text-gray-400">#8852</td>
+                                    <td class="px-6 py-4 font-bold text-gray-800 flex items-center gap-2">
+                                        <div class="w-6 h-6 rounded-full bg-purple-200"></div> أحمد علي
+                                    </td>
+                                    <td class="px-6 py-4 font-bold text-gray-800">$450.00</td>
+                                    <td class="px-6 py-4"><span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">مكتمل</span></td>
+                                </tr>
+                                <tr class="hover:bg-purple-50/30 transition cursor-pointer">
+                                    <td class="px-6 py-4 text-gray-400">#8853</td>
+                                    <td class="px-6 py-4 font-bold text-gray-800 flex items-center gap-2">
+                                        <div class="w-6 h-6 rounded-full bg-pink-200"></div> سارة محمد
+                                    </td>
+                                    <td class="px-6 py-4 font-bold text-gray-800">$120.50</td>
+                                    <td class="px-6 py-4"><span class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">معالجة</span></td>
+                                </tr>
+                                <tr class="hover:bg-purple-50/30 transition cursor-pointer">
+                                    <td class="px-6 py-4 text-gray-400">#8854</td>
+                                    <td class="px-6 py-4 font-bold text-gray-800 flex items-center gap-2">
+                                        <div class="w-6 h-6 rounded-full bg-blue-200"></div> شركة النماء
+                                    </td>
+                                    <td class="px-6 py-4 font-bold text-gray-800">$1,200.00</td>
+                                    <td class="px-6 py-4"><span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">مكتمل</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card p-6">
+                    <h3 class="font-bold text-lg mb-4">المنتجات الأكثر مبيعاً</h3>
+                    <div class="h-60"><canvas id="productsChart"></canvas></div>
+                    <ul class="mt-4 space-y-3">
+                        <li class="flex justify-between items-center text-sm"><span class="text-gray-600">ايفون 15 برو</span> <span class="font-bold text-gray-900">450 وحدة</span></li>
+                        <li class="flex justify-between items-center text-sm"><span class="text-gray-600">ماك بوك اير</span> <span class="font-bold text-gray-900">210 وحدة</span></li>
+                        <li class="flex justify-between items-center text-sm"><span class="text-gray-600">ساعة ابل</span> <span class="font-bold text-gray-900">180 وحدة</span></li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        Chart.defaults.font.family = 'Cairo';
+
+        // 1. Sales Chart (Dual Bar)
+        new Chart(document.getElementById('salesChart'), {
+            type: 'bar',
+            data: {
+                labels: ['السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'],
+                datasets: [
+                    {
+                        label: 'المبيعات',
+                        data: [120, 190, 30, 50, 20, 300],
+                        backgroundColor: '#8B5CF6',
+                        borderRadius: 8,
+                    },
+                    {
+                        label: 'الزيارات',
+                        data: [100, 150, 60, 80, 40, 250],
+                        backgroundColor: '#FBCFE8',
+                        borderRadius: 8,
+                    }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: { x: { grid: { display: false } }, y: { border: { display: false } } },
+                plugins: { legend: { position: 'top', align: 'end' } }
+            }
+        });
+
+        // 2. Polar Area Chart
+        new Chart(document.getElementById('polarChart'), {
+            type: 'polarArea',
+            data: {
+                labels: ['إلكترونيات', 'أزياء', 'منزل', 'جمال', 'رياضة'],
+                datasets: [{
+                    data: [11, 16, 7, 14, 10],
+                    backgroundColor: [
+                        'rgba(139, 92, 246, 0.8)', // Purple
+                        'rgba(236, 72, 153, 0.8)', // Pink
+                        'rgba(245, 158, 11, 0.8)', // Amber
+                        'rgba(99, 102, 241, 0.8)', // Indigo
+                        'rgba(16, 185, 129, 0.8)'  // Emerald
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { r: { ticks: { display: false }, grid: { color: '#f3e8ff' } } }, plugins: { legend: { display: false } } }
+        });
+
+        // 3. Products Horizontal Bar
+        new Chart(document.getElementById('productsChart'), {
+            type: 'bar',
+            data: {
+                labels: ['ايفون', 'ماك بوك', 'ايباد', 'ساعة', 'ايربودز'],
+                datasets: [{
+                    data: [85, 60, 45, 30, 20],
+                    backgroundColor: ['#8B5CF6', '#A78BFA', '#C4B5FD', '#DDD6FE', '#EDE9FE'],
+                    borderRadius: 4, barThickness: 15
+                }]
+            },
+            options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { grid: { display: false } } } }
+        });
+    </script>
+</body>
+</html>

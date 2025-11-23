@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>داشبورد الإيرادات | المهني</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { teal: { 50: '#f0fdfa', 100: '#ccfbf1', 500: '#14b8a6', 700: '#0f766e', 800: '#115e59', 900: '#134e4a' } } } }
+        }
+    </script>
+    <style>
+        body { font-family: 'Cairo', sans-serif; background-color: #f0fdfa; color: #134e4a; }
+        .card { background-color: white; border: 1px solid #e2e8f0; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="flex min-h-screen">
+        <aside class="hidden lg:flex flex-col w-20 hover:w-64 transition-all duration-300 bg-teal-900 h-screen sticky top-0 overflow-hidden group">
+            <div class="p-6 flex items-center gap-4 text-teal-50">
+                <i class="ph ph-buildings text-2xl shrink-0"></i>
+                <span class="font-bold text-xl whitespace-nowrap opacity-0 group-hover:opacity-100 transition duration-300">CORPORATE</span>
+            </div>
+            <nav class="flex-1 mt-6 space-y-2 px-3">
+                <a href="#" class="flex items-center gap-4 p-3 bg-teal-800 text-white rounded-md">
+                    <i class="ph ph-squares-four text-xl shrink-0"></i>
+                    <span class="whitespace-nowrap opacity-0 group-hover:opacity-100 transition duration-300">نظرة عامة</span>
+                </a>
+                <a href="#" class="flex items-center gap-4 p-3 text-teal-200 hover:bg-teal-800 rounded-md transition">
+                    <i class="ph ph-file-text text-xl shrink-0"></i>
+                    <span class="whitespace-nowrap opacity-0 group-hover:opacity-100 transition duration-300">القوائم المالية</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="flex-1 p-8">
+            <header class="flex justify-between items-center mb-8 pb-4 border-b border-slate-200">
+                <div>
+                    <h1 class="text-2xl font-bold text-teal-900">التقرير المالي الموحد</h1>
+                    <p class="text-slate-500 text-sm">آخر تحديث: 23 يونيو 2025</p>
+                </div>
+                <div class="flex gap-2">
+                    <button class="px-4 py-2 bg-white border border-slate-300 text-slate-600 rounded shadow-sm text-sm hover:bg-slate-50">تصدير Excel</button>
+                    <button class="px-4 py-2 bg-teal-700 text-white rounded shadow-sm text-sm hover:bg-teal-800">تقرير جديد +</button>
+                </div>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="card p-4 border-t-4 border-t-teal-600">
+                    <div class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">صافي الإيراد</div>
+                    <div class="text-2xl font-bold text-teal-900">1,250,400 ر.س</div>
+                    <div class="text-xs text-green-600 mt-1">▲ 8.2% عن الميزانية</div>
+                </div>
+                <div class="card p-4 border-t-4 border-t-teal-400">
+                    <div class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">المصروفات التشغيلية</div>
+                    <div class="text-2xl font-bold text-teal-900">840,200 ر.س</div>
+                    <div class="text-xs text-red-600 mt-1">▲ 2.1% زيادة</div>
+                </div>
+                <div class="card p-4 border-t-4 border-t-teal-300">
+                    <div class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">هامش الربح</div>
+                    <div class="text-2xl font-bold text-teal-900">32.8%</div>
+                    <div class="text-xs text-slate-500 mt-1">مستقر</div>
+                </div>
+                <div class="card p-4 border-t-4 border-t-slate-400">
+                    <div class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">الرصيد النقدي</div>
+                    <div class="text-2xl font-bold text-teal-900">450,000 ر.س</div>
+                    <div class="text-xs text-green-600 mt-1">سيولة ممتازة</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                <div class="card p-6 lg:col-span-2">
+                    <h3 class="font-bold text-teal-900 mb-6 border-b border-slate-100 pb-2">التدفقات النقدية (شهري)</h3>
+                    <div class="h-64"><canvas id="cashflowChart"></canvas></div>
+                </div>
+                <div class="card p-6">
+                    <h3 class="font-bold text-teal-900 mb-6 border-b border-slate-100 pb-2">هيكل التكاليف</h3>
+                    <div class="h-48 flex justify-center"><canvas id="costChart"></canvas></div>
+                    <div class="mt-4 text-center text-xs text-slate-500">تمثل الرواتب الجزء الأكبر بنسبة 60%</div>
+                </div>
+            </div>
+
+            <div class="card overflow-hidden">
+                <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+                    <h3 class="font-bold text-teal-900">سجل العمليات التفصيلي</h3>
+                    <input type="text" placeholder="بحث في السجل..." class="text-sm border border-slate-300 rounded px-3 py-1 w-64">
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-right">
+                        <thead class="bg-slate-100 text-slate-600 font-bold border-b border-slate-200">
+                            <tr>
+                                <th class="px-6 py-3">رقم المرجع</th>
+                                <th class="px-6 py-3">الوصف</th>
+                                <th class="px-6 py-3">القسم</th>
+                                <th class="px-6 py-3">دائن (له)</th>
+                                <th class="px-6 py-3">مدين (عليه)</th>
+                                <th class="px-6 py-3">التاريخ</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <tr class="hover:bg-teal-50 transition">
+                                <td class="px-6 py-3 font-mono text-slate-500">TRX-001</td>
+                                <td class="px-6 py-3 font-bold text-teal-900">إيراد عقد صيانة - شركة أرامكو</td>
+                                <td class="px-6 py-3"><span class="bg-slate-200 text-slate-700 px-2 py-0.5 rounded text-xs">مشاريع</span></td>
+                                <td class="px-6 py-3 text-green-700 font-bold">150,000.00</td>
+                                <td class="px-6 py-3 text-slate-400">-</td>
+                                <td class="px-6 py-3">2025/06/20</td>
+                            </tr>
+                            <tr class="hover:bg-teal-50 transition">
+                                <td class="px-6 py-3 font-mono text-slate-500">TRX-002</td>
+                                <td class="px-6 py-3 font-bold text-teal-900">رواتب شهر مايو</td>
+                                <td class="px-6 py-3"><span class="bg-slate-200 text-slate-700 px-2 py-0.5 rounded text-xs">موارد بشرية</span></td>
+                                <td class="px-6 py-3 text-slate-400">-</td>
+                                <td class="px-6 py-3 text-red-700 font-bold">320,000.00</td>
+                                <td class="px-6 py-3">2025/06/25</td>
+                            </tr>
+                            <tr class="hover:bg-teal-50 transition">
+                                <td class="px-6 py-3 font-mono text-slate-500">TRX-003</td>
+                                <td class="px-6 py-3 font-bold text-teal-900">شراء أجهزة خوادم</td>
+                                <td class="px-6 py-3"><span class="bg-slate-200 text-slate-700 px-2 py-0.5 rounded text-xs">IT</span></td>
+                                <td class="px-6 py-3 text-slate-400">-</td>
+                                <td class="px-6 py-3 text-red-700 font-bold">45,000.00</td>
+                                <td class="px-6 py-3">2025/06/18</td>
+                            </tr>
+                            <tr class="hover:bg-teal-50 transition">
+                                <td class="px-6 py-3 font-mono text-slate-500">TRX-004</td>
+                                <td class="px-6 py-3 font-bold text-teal-900">استرداد ضريبي</td>
+                                <td class="px-6 py-3"><span class="bg-slate-200 text-slate-700 px-2 py-0.5 rounded text-xs">مالية</span></td>
+                                <td class="px-6 py-3 text-green-700 font-bold">12,500.00</td>
+                                <td class="px-6 py-3 text-slate-400">-</td>
+                                <td class="px-6 py-3">2025/06/15</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="p-4 border-t border-slate-200 bg-slate-50 text-center text-sm text-teal-700 font-bold cursor-pointer hover:bg-slate-100">
+                    عرض جميع السجلات (1,402 سجل)
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Monochromatic Config
+        Chart.defaults.font.family = 'Cairo';
+
+        // 1. Cashflow Chart (Line Area)
+        new Chart(document.getElementById('cashflowChart'), {
+            type: 'line',
+            data: {
+                labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
+                datasets: [
+                    {
+                        label: 'الإيرادات',
+                        data: [120, 130, 110, 150, 140, 160],
+                        borderColor: '#0f766e', // Teal 700
+                        backgroundColor: 'rgba(15, 118, 110, 0.1)',
+                        fill: true, tension: 0
+                    },
+                    {
+                        label: 'المصروفات',
+                        data: [90, 95, 85, 100, 110, 95],
+                        borderColor: '#94a3b8', // Slate 400
+                        borderDash: [5, 5], tension: 0
+                    }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                scales: { x: { grid: { display: false } }, y: { grid: { borderDash: [2, 2] } } }
+            }
+        });
+
+        // 2. Cost Structure (Pie)
+        new Chart(document.getElementById('costChart'), {
+            type: 'pie',
+            data: {
+                labels: ['رواتب', 'تشغيل', 'تسويق', 'إدارية'],
+                datasets: [{
+                    data: [60, 20, 15, 5],
+                    backgroundColor: ['#115e59', '#14b8a6', '#5eead4', '#ccfbf1'],
+                    borderWidth: 1, borderColor: '#fff'
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 12 } } } }
+        });
+    </script>
+</body>
+</html>

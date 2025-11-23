@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>داشبورد الإيرادات | الوضع الليلي المطور</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: { 900: '#0B1120', 800: '#1E293B', 700: '#334155' },
+                        neon: { blue: '#38BDF8', green: '#34D399', purple: '#A78BFA', rose: '#FB7185' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Cairo', sans-serif; background-color: #0B1120; color: #E2E8F0; }
+        .card { background-color: #1E293B; border: 1px solid #334155; border-radius: 12px; transition: all 0.3s ease; }
+        .card:hover { border-color: #38BDF8; box-shadow: 0 0 15px rgba(56, 189, 248, 0.1); }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0B1120; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    </style>
+</head>
+<body class="text-slate-100">
+
+    <div class="flex min-h-screen">
+        <aside class="hidden lg:flex flex-col w-64 bg-dark-900 border-l border-dark-700 h-screen sticky top-0 z-20">
+            <div class="p-6 border-b border-dark-700">
+                <div class="text-2xl font-bold text-white flex items-center gap-2">
+                    <i class="ph ph-planet text-neon-blue text-3xl"></i>
+                    <span>NIGHT<span class="text-neon-blue">VIS</span></span>
+                </div>
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="#" class="flex items-center gap-3 p-3 bg-dark-800 text-neon-blue border border-neon-blue/30 rounded-lg font-bold shadow-[0_0_10px_rgba(56,189,248,0.2)]">
+                    <i class="ph ph-squares-four text-xl"></i> نظرة عامة
+                </a>
+                <a href="#" class="flex items-center gap-3 p-3 text-slate-400 hover:text-white hover:bg-dark-800 rounded-lg transition">
+                    <i class="ph ph-chart-bar text-xl"></i> التقارير
+                </a>
+            </nav>
+        </aside>
+
+        <main class="flex-1 flex flex-col min-w-0">
+            <header class="bg-dark-900 border-b border-dark-700 h-16 flex items-center justify-between px-8">
+                <h1 class="text-xl font-bold text-white">لوحة القيادة المركزية</h1>
+                <div class="flex gap-4">
+                    <button class="p-2 text-slate-400 hover:text-white"><i class="ph ph-bell text-xl"></i></button>
+                    <div class="w-8 h-8 rounded-full bg-neon-blue/20 text-neon-blue flex items-center justify-center border border-neon-blue font-bold">A</div>
+                </div>
+            </header>
+
+            <div class="p-6 space-y-6 overflow-y-auto h-[calc(100vh-64px)]">
+                
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="card p-5 relative overflow-hidden group">
+                        <div class="absolute right-0 top-0 w-24 h-24 bg-neon-blue/10 rounded-bl-full transition-transform group-hover:scale-110"></div>
+                        <p class="text-slate-400 text-sm mb-1">إجمالي الإيرادات</p>
+                        <h3 class="text-3xl font-bold text-white mb-2">540,200</h3>
+                        <p class="text-xs text-neon-green flex items-center gap-1"><i class="ph ph-trend-up"></i> +12.5% نمو</p>
+                    </div>
+                    <div class="card p-5 border-neon-green/30">
+                        <p class="text-slate-400 text-sm mb-1">المحصل الفعلي</p>
+                        <h3 class="text-3xl font-bold text-white mb-2">480,500</h3>
+                        <div class="w-full bg-dark-900 rounded-full h-1.5 mt-2">
+                            <div class="bg-neon-green h-1.5 rounded-full shadow-[0_0_10px_#34D399]" style="width: 88%"></div>
+                        </div>
+                    </div>
+                    <div class="card p-5">
+                        <p class="text-slate-400 text-sm mb-1">العملاء الجدد</p>
+                        <h3 class="text-3xl font-bold text-white mb-2">1,240</h3>
+                        <p class="text-xs text-neon-purple flex items-center gap-1"><i class="ph ph-users"></i> +45 عميل هذا الشهر</p>
+                    </div>
+                    <div class="card p-5 border-neon-rose/30">
+                        <p class="text-slate-400 text-sm mb-1">المتأخرات</p>
+                        <h3 class="text-3xl font-bold text-white mb-2">59,700</h3>
+                        <p class="text-xs text-neon-rose flex items-center gap-1"><i class="ph ph-warning"></i> انتباه مطلوب</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="card p-6 col-span-2">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-lg">تحليل الإيرادات (6 أشهر)</h3>
+                            <div class="flex gap-2">
+                                <span class="flex items-center text-xs text-slate-400"><span class="w-2 h-2 rounded-full bg-neon-blue mr-1"></span> مفوتر</span>
+                                <span class="flex items-center text-xs text-slate-400"><span class="w-2 h-2 rounded-full bg-neon-green mr-1"></span> محصل</span>
+                            </div>
+                        </div>
+                        <div class="h-64"><canvas id="mainChart"></canvas></div>
+                    </div>
+
+                    <div class="card p-6">
+                        <h3 class="font-bold text-lg mb-4 text-center">مصادر الدخل</h3>
+                        <div class="relative h-48">
+                            <canvas id="doughnutChart"></canvas>
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <div class="text-center">
+                                    <span class="block text-2xl font-bold text-white">3</span>
+                                    <span class="text-xs text-slate-400">مصادر</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 space-y-2">
+                            <div class="flex justify-between text-xs text-slate-300"><span>استشارات</span><span class="text-neon-blue">45%</span></div>
+                            <div class="flex justify-between text-xs text-slate-300"><span>تراخيص</span><span class="text-neon-purple">30%</span></div>
+                            <div class="flex justify-between text-xs text-slate-300"><span>دعم فني</span><span class="text-neon-rose">25%</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="card p-6">
+                        <h3 class="font-bold text-lg mb-4">أعلى 5 عملاء (إيرادات)</h3>
+                        <div class="h-56"><canvas id="barChart"></canvas></div>
+                    </div>
+
+                    <div class="card p-6">
+                        <h3 class="font-bold text-lg mb-4">الأداء حسب المنطقة</h3>
+                        <div class="h-56"><canvas id="radarChart"></canvas></div>
+                    </div>
+                </div>
+
+                <div class="card p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-lg">تفاصيل العمليات الأخيرة</h3>
+                        <button class="text-xs bg-dark-900 border border-dark-700 hover:border-neon-blue text-slate-300 px-3 py-1 rounded transition">تصدير CSV</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-right text-slate-400">
+                            <thead class="text-xs text-slate-500 uppercase bg-dark-900">
+                                <tr>
+                                    <th class="px-4 py-3 rounded-r-lg">العميل</th>
+                                    <th class="px-4 py-3">التاريخ</th>
+                                    <th class="px-4 py-3">الخدمة</th>
+                                    <th class="px-4 py-3">المبلغ</th>
+                                    <th class="px-4 py-3">الحالة</th>
+                                    <th class="px-4 py-3 rounded-l-lg">إجراء</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-dark-700">
+                                <tr class="hover:bg-dark-800/50 transition">
+                                    <td class="px-4 py-3 font-medium text-white">شركة الأفق الرقمي</td>
+                                    <td class="px-4 py-3">2025/06/15</td>
+                                    <td class="px-4 py-3">تطوير منصة</td>
+                                    <td class="px-4 py-3 text-neon-green">12,500 ر.س</td>
+                                    <td class="px-4 py-3"><span class="bg-green-500/10 text-green-400 px-2 py-0.5 rounded text-xs border border-green-500/20">مدفوع</span></td>
+                                    <td class="px-4 py-3"><i class="ph ph-dots-three text-lg cursor-pointer hover:text-white"></i></td>
+                                </tr>
+                                <tr class="hover:bg-dark-800/50 transition">
+                                    <td class="px-4 py-3 font-medium text-white">مجموعة البناء الحديث</td>
+                                    <td class="px-4 py-3">2025/06/14</td>
+                                    <td class="px-4 py-3">استشارات</td>
+                                    <td class="px-4 py-3 text-white">4,200 ر.س</td>
+                                    <td class="px-4 py-3"><span class="bg-yellow-500/10 text-yellow-400 px-2 py-0.5 rounded text-xs border border-yellow-500/20">معلق</span></td>
+                                    <td class="px-4 py-3"><i class="ph ph-dots-three text-lg cursor-pointer hover:text-white"></i></td>
+                                </tr>
+                                <tr class="hover:bg-dark-800/50 transition">
+                                    <td class="px-4 py-3 font-medium text-white">مؤسسة النور</td>
+                                    <td class="px-4 py-3">2025/06/12</td>
+                                    <td class="px-4 py-3">دعم فني</td>
+                                    <td class="px-4 py-3 text-white">1,500 ر.س</td>
+                                    <td class="px-4 py-3"><span class="bg-red-500/10 text-red-400 px-2 py-0.5 rounded text-xs border border-red-500/20">متأخر</span></td>
+                                    <td class="px-4 py-3"><i class="ph ph-dots-three text-lg cursor-pointer hover:text-white"></i></td>
+                                </tr>
+                                <tr class="hover:bg-dark-800/50 transition">
+                                    <td class="px-4 py-3 font-medium text-white">تقنية المستقبل</td>
+                                    <td class="px-4 py-3">2025/06/10</td>
+                                    <td class="px-4 py-3">تراخيص</td>
+                                    <td class="px-4 py-3 text-neon-green">8,000 ر.س</td>
+                                    <td class="px-4 py-3"><span class="bg-green-500/10 text-green-400 px-2 py-0.5 rounded text-xs border border-green-500/20">مدفوع</span></td>
+                                    <td class="px-4 py-3"><i class="ph ph-dots-three text-lg cursor-pointer hover:text-white"></i></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Global defaults
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.borderColor = '#334155';
+        Chart.defaults.font.family = 'Cairo';
+
+        // 1. Main Line Chart
+        new Chart(document.getElementById('mainChart'), {
+            type: 'line',
+            data: {
+                labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
+                datasets: [
+                    {
+                        label: 'المحصل',
+                        data: [65, 59, 80, 81, 56, 95],
+                        borderColor: '#34D399',
+                        backgroundColor: (ctx) => {
+                            const gradient = ctx.chart.ctx.createLinearGradient(0, 0, 0, 300);
+                            gradient.addColorStop(0, 'rgba(52, 211, 153, 0.2)');
+                            gradient.addColorStop(1, 'rgba(52, 211, 153, 0)');
+                            return gradient;
+                        },
+                        fill: true, tension: 0.4, borderWidth: 3
+                    },
+                    {
+                        label: 'المفوتر',
+                        data: [70, 62, 85, 90, 60, 100],
+                        borderColor: '#38BDF8',
+                        borderDash: [5, 5], tension: 0.4, borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: { legend: { display: false } },
+                scales: { y: { grid: { borderDash: [2, 4] } }, x: { grid: { display: false } } }
+            }
+        });
+
+        // 2. Doughnut Chart
+        new Chart(document.getElementById('doughnutChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['استشارات', 'تراخيص', 'دعم فني'],
+                datasets: [{
+                    data: [45, 30, 25],
+                    backgroundColor: ['#38BDF8', '#A78BFA', '#FB7185'],
+                    borderWidth: 0, hoverOffset: 4
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+
+        // 3. Horizontal Bar Chart (Top Accounts)
+        new Chart(document.getElementById('barChart'), {
+            type: 'bar',
+            data: {
+                labels: ['شركة الأفق', 'مجموعة البناء', 'تقنية المستقبل', 'سوبر ماركت', 'مؤسسة النور'],
+                datasets: [{
+                    label: 'الإيراد',
+                    data: [120000, 95000, 75000, 60000, 45000],
+                    backgroundColor: '#38BDF8',
+                    borderRadius: 4,
+                    barThickness: 20
+                }]
+            },
+            options: {
+                indexAxis: 'y', // Makes it horizontal
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { x: { grid: { display: false } }, y: { grid: { display: false } } }
+            }
+        });
+
+        // 4. Radar Chart (Regional)
+        new Chart(document.getElementById('radarChart'), {
+            type: 'radar',
+            data: {
+                labels: ['الرياض', 'جدة', 'الدمام', 'مكة', 'المدينة'],
+                datasets: [{
+                    label: 'المبيعات',
+                    data: [85, 70, 90, 60, 50],
+                    backgroundColor: 'rgba(167, 139, 250, 0.2)',
+                    borderColor: '#A78BFA',
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#A78BFA',
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: { r: { angleLines: { color: '#334155' }, grid: { color: '#334155' }, pointLabels: { color: '#cbd5e1' } } }
+            }
+        });
+    </script>
+</body>
+</html>
