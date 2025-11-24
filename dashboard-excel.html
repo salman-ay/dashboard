@@ -79,9 +79,522 @@
             content: ' ▼';
             font-size: 10px;
         }
+        
+        /* ============================================
+           THEME STYLES
+           ============================================ */
+        
+        /* Light Theme (Default) */
+        [data-theme="light"] {
+            --bg-primary: #FFFFFF;
+            --bg-card: #FFFFFF;
+            --bg-sidebar: #1E40AF;
+            --bg-header: #FFFFFF;
+            --bg-input: #F8F9FA;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --border-color: #E5E7EB;
+            --border-sidebar: #1E40AF;
+            --nav-active: #1E40AF;
+            --nav-hover: #F3F4F6;
+            --scrollbar-track: #f1f1f1;
+            --scrollbar-thumb: #cbd5e1;
+        }
+        
+        /* Dark Theme */
+        [data-theme="dark"] {
+            --bg-primary: #0F172A;
+            --bg-card: #1E293B;
+            --bg-sidebar: #1E293B;
+            --bg-header: #1E293B;
+            --bg-input: #334155;
+            --text-primary: #F1F5F9;
+            --text-secondary: #CBD5E1;
+            --text-muted: #94a3b8;
+            --border-color: #475569;
+            --border-sidebar: #475569;
+            --nav-active: #3B82F6;
+            --nav-hover: #334155;
+            --scrollbar-track: #1E293B;
+            --scrollbar-thumb: #475569;
+        }
+        
+        /* Mono Theme */
+        [data-theme="mono"] {
+            --bg-primary: #F0FDFA;
+            --bg-card: #FFFFFF;
+            --bg-sidebar: #0F766E;
+            --bg-header: #FFFFFF;
+            --bg-input: #F0FDFA;
+            --text-primary: #134e4a;
+            --text-secondary: #0f766e;
+            --text-muted: #14b8a6;
+            --border-color: #14b8a6;
+            --border-sidebar: #0F766E;
+            --nav-active: #0f766e;
+            --nav-hover: #E6FFFA;
+            --scrollbar-track: #f1f1f1;
+            --scrollbar-thumb: #14b8a6;
+        }
+        
+        /* Apply theme variables */
+        [data-theme="light"] body,
+        [data-theme="dark"] body,
+        [data-theme="mono"] body {
+            background-color: var(--bg-primary);
+        }
+        
+        /* Main content area background */
+        [data-theme="dark"] main {
+            background-color: var(--bg-primary) !important;
+        }
+        
+        [data-theme="dark"] main > div.flex-1 {
+            background-color: var(--bg-primary) !important;
+        }
+        
+        [data-theme="dark"] .flex-1.overflow-y-auto {
+            background-color: var(--bg-primary) !important;
+        }
+        
+        [data-theme="light"] .card,
+        [data-theme="dark"] .card,
+        [data-theme="mono"] .card {
+            background-color: var(--bg-card);
+        }
+        
+        [data-theme="light"] .card {
+            border: 1px solid #E5E7EB !important;
+        }
+        
+        [data-theme="dark"] .card {
+            border: 1px solid var(--border-color);
+        }
+        
+        [data-theme="mono"] .card {
+            border: 1px solid var(--border-color);
+        }
+        
+        /* KPI Cards with light gray background in light theme */
+        [data-theme="light"] .card.border-r-4 {
+            background-color: #F9FAFB !important;
+            border: 1px solid #E5E7EB !important;
+        }
+        
+        [data-theme="light"] .card.p-4.flex.items-center.justify-between {
+            background-color: #F9FAFB !important;
+            border: 1px solid #E5E7EB !important;
+        }
+        
+        [data-theme="dark"] .card:hover {
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+        
+        [data-theme="mono"] .card:hover {
+            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.15);
+        }
+        
+        [data-theme="dark"] .nav-item.active {
+            background-color: var(--nav-active);
+        }
+        
+        [data-theme="mono"] .nav-item.active {
+            background-color: var(--nav-active);
+        }
+        
+        [data-theme="dark"] ::-webkit-scrollbar-track {
+            background: var(--scrollbar-track);
+        }
+        
+        [data-theme="dark"] ::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+        }
+        
+        [data-theme="mono"] ::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+        }
+        
+        [data-theme="dark"] .loading-spinner {
+            background: rgba(15, 23, 42, 0.9);
+        }
+        
+        /* Sidebar Styles */
+        [data-theme="light"] aside {
+            background-color: var(--bg-sidebar) !important;
+            border-color: var(--border-sidebar) !important;
+        }
+        
+        [data-theme="light"] aside .text-blue-900 {
+            color: white !important;
+        }
+        
+        [data-theme="light"] aside .nav-item:not(.active) {
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+        
+        [data-theme="light"] aside .nav-item:not(.active):hover {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            color: white !important;
+        }
+        
+        [data-theme="light"] aside .border-b,
+        [data-theme="light"] aside .border-t {
+            border-color: rgba(255, 255, 255, 0.2) !important;
+        }
+        
+        [data-theme="dark"] aside {
+            background-color: var(--bg-sidebar) !important;
+            border-color: var(--border-sidebar) !important;
+        }
+        
+        [data-theme="mono"] aside {
+            background-color: var(--bg-sidebar) !important;
+            border-color: var(--border-sidebar) !important;
+        }
+        
+        [data-theme="mono"] aside .text-blue-900 {
+            color: white !important;
+        }
+        
+        [data-theme="mono"] aside .nav-item:not(.active) {
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+        
+        [data-theme="mono"] aside .nav-item:not(.active):hover {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            color: white !important;
+        }
+        
+        [data-theme="mono"] aside .border-b,
+        [data-theme="mono"] aside .border-t {
+            border-color: rgba(255, 255, 255, 0.2) !important;
+        }
+        
+        [data-theme="dark"] aside .border-b,
+        [data-theme="dark"] aside .border-t {
+            border-color: var(--border-sidebar) !important;
+        }
+        
+        [data-theme="mono"] aside .border-b,
+        [data-theme="mono"] aside .border-t {
+            border-color: var(--border-sidebar) !important;
+        }
+        
+        [data-theme="dark"] .nav-item:not(.active) {
+            color: var(--text-secondary) !important;
+        }
+        
+        [data-theme="dark"] .nav-item:not(.active):hover {
+            background-color: var(--nav-hover) !important;
+            color: var(--text-primary) !important;
+        }
+        
+        [data-theme="mono"] .nav-item:not(.active) {
+            color: var(--text-secondary) !important;
+        }
+        
+        [data-theme="mono"] .nav-item:not(.active):hover {
+            background-color: var(--nav-hover) !important;
+            color: var(--text-primary) !important;
+        }
+        
+        /* Header Styles */
+        [data-theme="dark"] header {
+            background-color: var(--bg-header) !important;
+            border-color: var(--border-color) !important;
+        }
+        
+        [data-theme="mono"] header {
+            background-color: var(--bg-header) !important;
+            border-color: var(--border-color) !important;
+        }
+        
+        [data-theme="dark"] header h1,
+        [data-theme="dark"] header button {
+            color: var(--text-primary) !important;
+        }
+        
+        [data-theme="mono"] header h1,
+        [data-theme="mono"] header button {
+            color: var(--text-primary) !important;
+        }
+        
+        [data-theme="dark"] header button:hover {
+            background-color: var(--nav-hover) !important;
+        }
+        
+        [data-theme="mono"] header button:hover {
+            background-color: var(--nav-hover) !important;
+        }
+        
+        /* Filter and Input Styles */
+        [data-theme="dark"] .bg-white {
+            background-color: var(--bg-card) !important;
+        }
+        
+        [data-theme="dark"] select,
+        [data-theme="dark"] input {
+            background-color: #1e293b !important;
+            border-color: var(--border-color) !important;
+            color: var(--text-primary) !important;
+        }
+        
+        [data-theme="mono"] select,
+        [data-theme="mono"] input {
+            background-color: var(--bg-input) !important;
+            border-color: var(--border-color) !important;
+            color: var(--text-primary) !important;
+        }
+        
+        /* Text Colors */
+        [data-theme="dark"] .text-gray-800,
+        [data-theme="dark"] .text-gray-900 {
+            color: var(--text-primary) !important;
+        }
+        
+        [data-theme="dark"] .text-gray-500,
+        [data-theme="dark"] .text-gray-600,
+        [data-theme="dark"] .text-gray-700 {
+            color: var(--text-secondary) !important;
+        }
+        
+        [data-theme="mono"] .text-gray-800,
+        [data-theme="mono"] .text-gray-900 {
+            color: var(--text-primary) !important;
+        }
+        
+        [data-theme="mono"] .text-gray-500,
+        [data-theme="mono"] .text-gray-600,
+        [data-theme="mono"] .text-gray-700 {
+            color: var(--text-secondary) !important;
+        }
+        
+        /* Table Styles */
+        [data-theme="dark"] thead {
+            background-color: #1e293b !important;
+            color: var(--text-primary) !important;
+        }
+        
+        [data-theme="dark"] tbody tr {
+            background-color: var(--bg-card) !important;
+            border-color: var(--border-color) !important;
+            color: var(--text-secondary) !important;
+        }
+        
+        [data-theme="dark"] tbody tr:hover {
+            background-color: var(--nav-hover) !important;
+        }
+        
+        [data-theme="mono"] thead {
+            background-color: var(--bg-input) !important;
+            color: var(--text-primary) !important;
+        }
+        
+        [data-theme="mono"] tbody tr:hover {
+            background-color: var(--nav-hover) !important;
+        }
+        
+        /* Button Styles */
+        [data-theme="dark"] .bg-blue-900 {
+            background-color: #3B82F6 !important;
+        }
+        
+        [data-theme="dark"] .bg-blue-900:hover {
+            background-color: #2563EB !important;
+        }
+        
+        [data-theme="mono"] .bg-blue-900 {
+            background-color: var(--nav-active) !important;
+        }
+        
+        [data-theme="mono"] .bg-blue-900:hover {
+            background-color: #0d9488 !important;
+        }
+        
+        /* Additional theme overrides */
+        [data-theme="dark"] .bg-gray-50,
+        [data-theme="dark"] .bg-gray-100 {
+            background-color: #1e293b !important;
+        }
+        
+        [data-theme="dark"] .border-gray-200,
+        [data-theme="dark"] .border-gray-100 {
+            border-color: var(--border-color) !important;
+        }
+        
+        [data-theme="dark"] .hover\:bg-gray-50:hover,
+        [data-theme="dark"] .hover\:bg-gray-100:hover {
+            background-color: var(--nav-hover) !important;
+        }
+        
+        [data-theme="mono"] .border-gray-200,
+        [data-theme="mono"] .border-gray-100 {
+            border-color: var(--border-color) !important;
+        }
+        
+        [data-theme="mono"] .hover\:bg-gray-50:hover {
+            background-color: var(--nav-hover) !important;
+        }
+        
+        [data-theme="dark"] .text-blue-900 {
+            color: var(--text-primary) !important;
+        }
+        
+        [data-theme="mono"] .text-blue-900 {
+            color: var(--text-primary) !important;
+        }
+        
+        [data-theme="dark"] .bg-blue-50 {
+            background-color: rgba(59, 130, 246, 0.1) !important;
+        }
+        
+        [data-theme="dark"] .text-blue-600 {
+            color: #60a5fa !important;
+        }
+        
+        [data-theme="mono"] .bg-blue-50 {
+            background-color: var(--bg-input) !important;
+        }
+        
+        [data-theme="mono"] .text-blue-600 {
+            color: var(--text-secondary) !important;
+        }
+        
+        [data-theme="dark"] .text-green-600 {
+            color: #10b981 !important;
+        }
+        
+        [data-theme="mono"] .text-green-600 {
+            color: var(--text-secondary) !important;
+        }
+        
+        [data-theme="dark"] .bg-blue-100 {
+            background-color: rgba(59, 130, 246, 0.2) !important;
+        }
+        
+        [data-theme="dark"] .text-blue-700 {
+            color: #93c5fd !important;
+        }
+        
+        [data-theme="dark"] .border-blue-200 {
+            border-color: rgba(59, 130, 246, 0.3) !important;
+        }
+        
+        [data-theme="mono"] .bg-blue-100 {
+            background-color: var(--bg-input) !important;
+        }
+        
+        [data-theme="mono"] .text-blue-700 {
+            color: var(--text-primary) !important;
+        }
+        
+        [data-theme="mono"] .border-blue-200 {
+            border-color: var(--border-color) !important;
+        }
+        
+        /* Theme Dropdown Styles */
+        #themeDropdownMenu {
+            min-width: 160px;
+        }
+        
+        /* Unified theme option styles for all themes */
+        .theme-option {
+            color: #1f2937 !important;
+            background-color: transparent !important;
+            border: none !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+        }
+        
+        .theme-option:hover {
+            background-color: #f3f4f6 !important;
+            color: #111827 !important;
+        }
+        
+        .theme-option .theme-check {
+            color: #2563EB !important;
+        }
+        
+        /* Dark theme dropdown */
+        [data-theme="dark"] #themeDropdownMenu {
+            background-color: #1E293B !important;
+            border-color: #475569 !important;
+        }
+        
+        [data-theme="dark"] .theme-option {
+            color: #F1F5F9 !important;
+            background-color: transparent !important;
+        }
+        
+        [data-theme="dark"] .theme-option:hover {
+            background-color: #334155 !important;
+            color: #FFFFFF !important;
+        }
+        
+        [data-theme="dark"] .theme-option .theme-check {
+            color: #60A5FA !important;
+        }
+        
+        /* Mono theme dropdown */
+        [data-theme="mono"] #themeDropdownMenu {
+            background-color: white !important;
+            border-color: #14b8a6 !important;
+        }
+        
+        [data-theme="mono"] .theme-option {
+            color: #134e4a !important;
+            background-color: transparent !important;
+        }
+        
+        [data-theme="mono"] .theme-option:hover {
+            background-color: #E6FFFA !important;
+            color: #0f766e !important;
+        }
+        
+        [data-theme="mono"] .theme-option .theme-check {
+            color: #0f766e !important;
+        }
+        
+        /* Checkbox styles for comparison years */
+        [data-theme="dark"] input[type="checkbox"] {
+            background-color: #334155 !important;
+            border-color: #475569 !important;
+        }
+        
+        [data-theme="dark"] input[type="checkbox"]:checked {
+            background-color: #3B82F6 !important;
+            border-color: #3B82F6 !important;
+        }
+        
+        [data-theme="dark"] label span {
+            color: var(--text-primary) !important;
+        }
+        
+        [data-theme="dark"] label:hover {
+            background-color: #334155 !important;
+        }
+        
+        [data-theme="mono"] input[type="checkbox"] {
+            background-color: white !important;
+            border-color: var(--border-color) !important;
+        }
+        
+        [data-theme="mono"] input[type="checkbox"]:checked {
+            background-color: var(--nav-active) !important;
+            border-color: var(--nav-active) !important;
+        }
+        
+        [data-theme="mono"] label span {
+            color: var(--text-primary) !important;
+        }
+        
+        [data-theme="mono"] label:hover {
+            background-color: var(--nav-hover) !important;
+        }
     </style>
 </head>
-<body class="text-gray-800">
+<body class="text-gray-800" data-theme="light">
 
     <div class="flex min-h-screen">
         <!-- Sidebar -->
@@ -142,6 +655,27 @@
                         <i class="ph ph-magnifying-glass text-gray-400 ml-2"></i>
                         <input type="text" id="globalSearch" placeholder="بحث..." class="bg-transparent border-none outline-none text-sm w-48">
                     </div>
+                    <div class="relative" id="themeDropdownContainer">
+                        <button id="themeToggleBtn" class="p-2 text-gray-500 hover:bg-gray-100 rounded-full transition flex items-center gap-2" title="تبديل الثيم">
+                            <i class="ph ph-palette text-xl"></i>
+                            <span class="hidden md:inline text-sm" id="themeCurrentLabel">فاتح</span>
+                            <i class="ph ph-caret-down text-xs"></i>
+                        </button>
+                        <div id="themeDropdownMenu" class="hidden absolute left-0 top-full mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 z-50 overflow-hidden">
+                            <button class="theme-option w-full text-right px-4 py-2 transition flex items-center justify-between" data-theme="light">
+                                <span class="font-medium">فاتح</span>
+                                <i class="ph ph-check hidden theme-check"></i>
+                            </button>
+                            <button class="theme-option w-full text-right px-4 py-2 transition flex items-center justify-between" data-theme="dark">
+                                <span class="font-medium">داكن</span>
+                                <i class="ph ph-check hidden theme-check"></i>
+                            </button>
+                            <button class="theme-option w-full text-right px-4 py-2 transition flex items-center justify-between" data-theme="mono">
+                                <span class="font-medium">أحادي</span>
+                                <i class="ph ph-check hidden theme-check"></i>
+                            </button>
+                        </div>
+                    </div>
                     <button class="p-2 text-gray-500 hover:bg-gray-100 rounded-full relative">
                         <i class="ph ph-bell text-xl"></i>
                         <span class="absolute top-2 left-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
@@ -152,7 +686,7 @@
                 </div>
             </header>
 
-            <div class="flex-1 overflow-y-auto p-4 lg:p-8">
+            <div class="flex-1 overflow-y-auto p-4 lg:p-8" style="background-color: var(--bg-primary);">
                 
                 <!-- Page 1: Overview -->
                 <div id="overview" class="page active">
@@ -160,8 +694,7 @@
                     <div class="bg-white p-4 rounded-xl shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
                         <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
                             <div class="relative w-full md:w-auto">
-                                <span class="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400"><i class="ph ph-calendar"></i></span>
-                                <select id="filterYear" class="w-full md:w-48 bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block pr-10 pl-2.5 py-2.5 outline-none">
+                                <select id="filterYear" class="w-full md:w-48 bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2.5 outline-none">
                                     <option value="2025">2025</option>
                                     <option value="2024">2024</option>
                                     <option value="2023">2023</option>
@@ -550,11 +1083,22 @@
                     <div class="bg-white p-4 rounded-xl shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
                         <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
                             <div class="relative w-full md:w-auto">
-                                <select id="comparisonYears" multiple class="w-full md:w-48 bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2.5 outline-none">
-                                    <option value="2025" selected>2025</option>
-                                    <option value="2024" selected>2024</option>
-                                    <option value="2023">2023</option>
-                                </select>
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5">
+                                    <div class="flex flex-row gap-4 items-center flex-wrap">
+                                        <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-100 -mx-2 px-2 py-1 rounded transition">
+                                            <input type="checkbox" name="comparisonYears" value="2025" checked class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2">
+                                            <span class="text-sm text-gray-700">2025</span>
+                                        </label>
+                                        <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-100 -mx-2 px-2 py-1 rounded transition">
+                                            <input type="checkbox" name="comparisonYears" value="2024" checked class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2">
+                                            <span class="text-sm text-gray-700">2024</span>
+                                        </label>
+                                        <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-100 -mx-2 px-2 py-1 rounded transition">
+                                            <input type="checkbox" name="comparisonYears" value="2023" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2">
+                                            <span class="text-sm text-gray-700">2023</span>
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <button onclick="updateComparison()" class="w-full md:w-auto bg-blue-900 hover:bg-blue-800 text-white font-medium rounded-lg text-sm px-5 py-2.5 transition">تطبيق</button>
@@ -706,6 +1250,138 @@
     </aside>
 
     <script>
+        // ============================================
+        // THEME MANAGEMENT
+        // ============================================
+        function toggleThemeDropdown() {
+            const dropdown = document.getElementById('themeDropdownMenu');
+            if (dropdown) {
+                dropdown.classList.toggle('hidden');
+            }
+        }
+        
+        function selectTheme(themeName) {
+            applyTheme(themeName);
+            updateThemeDropdownUI(themeName);
+            const dropdown = document.getElementById('themeDropdownMenu');
+            if (dropdown) {
+                dropdown.classList.add('hidden');
+            }
+        }
+        
+        function updateThemeDropdownUI(themeName) {
+            const themeLabels = {
+                'light': 'فاتح',
+                'dark': 'داكن',
+                'mono': 'أحادي'
+            };
+            
+            // Update button label
+            const label = document.getElementById('themeCurrentLabel');
+            if (label) {
+                label.textContent = themeLabels[themeName] || 'فاتح';
+            }
+            
+            // Update checkmarks
+            document.querySelectorAll('.theme-option').forEach(option => {
+                const check = option.querySelector('.theme-check');
+                if (option.getAttribute('data-theme') === themeName) {
+                    if (check) check.classList.remove('hidden');
+                } else {
+                    if (check) check.classList.add('hidden');
+                }
+            });
+        }
+        
+        function applyTheme(themeName) {
+            document.body.setAttribute('data-theme', themeName);
+            saveTheme(themeName);
+            
+            // Re-render charts with new theme colors
+            const currentPage = document.querySelector('.page.active')?.id;
+            if (currentPage) {
+                const filters = getCurrentFilters();
+                fetchRevenueDataCached(filters).then(data => {
+                    if (data) {
+                        if (currentPage === 'overview') {
+                            initOverviewCharts(data);
+                            updateKPIs(data);
+                        } else if (currentPage === 'accounts') {
+                            initAccountsPage(data);
+                        } else if (currentPage === 'tabs') {
+                            initTabsPage(data);
+                        } else if (currentPage === 'comparison') {
+                            initComparisonPage(data);
+                        } else if (currentPage === 'details') {
+                            initDetailsPage(data);
+                        }
+                    }
+                });
+            }
+        }
+        
+        function loadSavedTheme() {
+            const savedTheme = localStorage.getItem('dashboardTheme');
+            if (savedTheme && ['light', 'dark', 'mono'].includes(savedTheme)) {
+                applyTheme(savedTheme);
+                // Update dropdown UI after a short delay to ensure DOM is ready
+                setTimeout(() => updateThemeDropdownUI(savedTheme), 100);
+            } else {
+                applyTheme('light');
+                setTimeout(() => updateThemeDropdownUI('light'), 100);
+            }
+        }
+        
+        function saveTheme(themeName) {
+            localStorage.setItem('dashboardTheme', themeName);
+        }
+        
+        function getChartColors() {
+            const theme = document.body.getAttribute('data-theme') || 'light';
+            
+            const lightColors = {
+                primary: '#3B82F6',
+                secondary: '#10B981',
+                accent: '#F59E0B',
+                purple: '#8B5CF6',
+                red: '#EF4444',
+                blue: '#2563EB',
+                green: '#059669',
+                orange: '#D97706'
+            };
+            
+            const darkColors = {
+                primary: '#3B82F6',
+                secondary: '#10B981',
+                accent: '#F59E0B',
+                purple: '#A855F7',
+                red: '#EF4444',
+                blue: '#3B9AF6',
+                green: '#10F981',
+                orange: '#F59E0B'
+            };
+            
+            const monoColors = {
+                primary: '#14b8a6',
+                secondary: '#0f766e',
+                accent: '#5eead4',
+                purple: '#0d9488',
+                red: '#134e4a',
+                blue: '#14b8a6',
+                green: '#0f766e',
+                orange: '#5eead4'
+            };
+            
+            switch(theme) {
+                case 'dark':
+                    return darkColors;
+                case 'mono':
+                    return monoColors;
+                default:
+                    return lightColors;
+            }
+        }
+        
         // ============================================
         // DATA SERVICE - Read from Excel File
         // ============================================
@@ -1100,6 +1776,32 @@
             
             // Keep dummy data as fallback
             getDummyData(filters) {
+                const currentYear = new Date().getFullYear();
+                const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+                const accounts = ['استشارات', 'مبيعات', 'خدمات'];
+                const tabs = ['منتج', 'خدمة', 'استشارة', 'أخرى'];
+                
+                // Generate sample details
+                const details = [];
+                for (let i = 0; i < 30; i++) {
+                    const monthIndex = i % 12;
+                    const account = accounts[i % accounts.length];
+                    const tab = tabs[i % tabs.length];
+                    const date = new Date(currentYear, monthIndex, (i % 28) + 1);
+                    const invoiced = Math.floor(Math.random() * 50000) + 10000;
+                    const collected = Math.floor(invoiced * 0.9);
+                    
+                    details.push({
+                        date: date.toISOString().split('T')[0],
+                        year: currentYear,
+                        month: months[monthIndex],
+                        account: account,
+                        tab: tab,
+                        invoiced: invoiced,
+                        collected: collected
+                    });
+                }
+                
                 return {
                     monthly: {
                         labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
@@ -1122,7 +1824,7 @@
                         { year: 2024, invoiced: 480000, collected: 410000, target: 1100000, achievement: 37, growth: 12 },
                         { year: 2023, invoiced: 420000, collected: 365000, target: 1000000, achievement: 37, growth: 8 }
                     ],
-                    details: []
+                    details: details.sort((a, b) => new Date(b.date) - new Date(a.date))
                 };
             },
             
@@ -1522,6 +2224,7 @@
 
         function initOverviewCharts(data) {
             if (!data) data = DataService.getDummyData();
+            const colors = getChartColors();
             
             // Main Chart
             const ctxMain = document.getElementById('mainChart');
@@ -1534,8 +2237,8 @@
                         {
                             label: 'المحصل',
                             data: data.monthly.collected,
-                            borderColor: '#10B981',
-                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderColor: colors.secondary,
+                            backgroundColor: colors.secondary + '1A',
                             borderWidth: 2,
                             tension: 0.4,
                             fill: true
@@ -1543,7 +2246,7 @@
                         {
                             label: 'المفوتر',
                             data: data.monthly.invoiced,
-                            borderColor: '#3B82F6',
+                            borderColor: colors.primary,
                             borderWidth: 2,
                             borderDash: [5, 5],
                             tension: 0.4,
@@ -1584,13 +2287,15 @@
             // Target Chart
             const ctxTarget = document.getElementById('targetChart');
             if (targetChart) targetChart.destroy();
+            const bgSecondary = document.body.getAttribute('data-theme') === 'dark' ? '#334155' : 
+                               document.body.getAttribute('data-theme') === 'mono' ? '#f0fdfa' : '#F3F4F6';
             targetChart = new Chart(ctxTarget, {
                 type: 'doughnut',
                 data: {
                     labels: ['محقق', 'متبقي'],
                     datasets: [{
                         data: [40, 60],
-                        backgroundColor: ['#2563EB', '#F3F4F6'],
+                        backgroundColor: [colors.primary, bgSecondary],
                         borderWidth: 0,
                         cutout: '75%'
                     }]
@@ -1613,13 +2318,13 @@
                         {
                             label: 'المفوتر',
                             data: data.accounts.map(a => a.invoiced),
-                            backgroundColor: '#3B82F6',
+                            backgroundColor: colors.primary,
                             borderRadius: 6
                         },
                         {
                             label: 'المحصل',
                             data: data.accounts.map(a => a.collected),
-                            backgroundColor: '#10B981',
+                            backgroundColor: colors.secondary,
                             borderRadius: 6
                         }
                     ]
@@ -1653,9 +2358,9 @@
                     labels: data.accounts.map(a => a.name),
                     datasets: [{
                         data: data.accounts.map(a => a.collected),
-                        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B'],
+                        backgroundColor: [colors.primary, colors.secondary, colors.accent],
                         borderWidth: 2,
-                        borderColor: '#fff'
+                        borderColor: document.body.getAttribute('data-theme') === 'dark' ? '#1E293B' : '#fff'
                     }]
                 },
                 options: {
@@ -1687,13 +2392,13 @@
                     datasets: [{
                         label: 'نسبة التحصيل %',
                         data: collectionRates,
-                        borderColor: '#8B5CF6',
-                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        borderColor: colors.purple,
+                        backgroundColor: colors.purple + '1A',
                         borderWidth: 3,
                         tension: 0.4,
                         fill: true,
                         pointRadius: 5,
-                        pointBackgroundColor: '#8B5CF6'
+                        pointBackgroundColor: colors.purple
                     }]
                 },
                 options: {
@@ -1725,17 +2430,17 @@
                         {
                             label: 'استشارات',
                             data: [20000, 18000, 25000, 28000, 20000, 30000],
-                            backgroundColor: '#3B82F6'
+                            backgroundColor: colors.primary
                         },
                         {
                             label: 'مبيعات',
                             data: [25000, 22000, 30000, 32000, 20000, 40000],
-                            backgroundColor: '#10B981'
+                            backgroundColor: colors.secondary
                         },
                         {
                             label: 'خدمات',
                             data: [20000, 19000, 25000, 21000, 16000, 25000],
-                            backgroundColor: '#F59E0B'
+                            backgroundColor: colors.accent
                         }
                     ]
                 },
@@ -1755,6 +2460,7 @@
 
         function initAccountsPage(data) {
             if (!data) data = DataService.getDummyData();
+            const colors = getChartColors();
             
             // Populate accounts table
             const tbody = document.getElementById('accountsTableBody');
@@ -1783,7 +2489,7 @@
                     datasets: [{
                         label: 'المحصل',
                         data: data.accounts.map(a => a.collected),
-                        backgroundColor: '#3B82F6',
+                        backgroundColor: colors.primary,
                         borderRadius: 6
                     }]
                 },
@@ -1811,7 +2517,7 @@
                     datasets: [{
                         label: 'نسبة التحقيق %',
                         data: targetRates,
-                        backgroundColor: ['#10B981', '#3B82F6', '#F59E0B'],
+                        backgroundColor: [colors.secondary, colors.primary, colors.accent],
                         borderRadius: 6
                     }]
                 },
@@ -1843,13 +2549,13 @@
                         {
                             label: 'المفوتر',
                             data: data.accounts.map(a => a.invoiced),
-                            backgroundColor: '#94A3B8',
+                            backgroundColor: colors.accent,
                             borderRadius: 6
                         },
                         {
                             label: 'المحصل',
                             data: data.accounts.map(a => a.collected),
-                            backgroundColor: '#10B981',
+                            backgroundColor: colors.secondary,
                             borderRadius: 6
                         }
                     ]
@@ -1870,6 +2576,7 @@
 
         function initTabsPage(data) {
             if (!data) data = DataService.getDummyData();
+            const colors = getChartColors();
             
             // Populate tabs table
             const tbody = document.getElementById('tabsTableBody');
@@ -1895,7 +2602,7 @@
                     labels: data.tabs.map(t => t.name),
                     datasets: [{
                         data: data.tabs.map(t => t.collected),
-                        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'],
+                        backgroundColor: [colors.primary, colors.secondary, colors.accent, colors.red],
                         borderWidth: 0
                     }]
                 },
@@ -1918,7 +2625,7 @@
                     datasets: [{
                         label: 'المحصل',
                         data: data.tabs.map(t => t.collected),
-                        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'],
+                        backgroundColor: [colors.primary, colors.secondary, colors.accent, colors.red],
                         borderRadius: 6
                     }]
                 },
@@ -1947,24 +2654,24 @@
                         {
                             label: 'منتج',
                             data: [35000, 32000, 40000, 42000, 30000, 50000],
-                            borderColor: '#3B82F6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderColor: colors.primary,
+                            backgroundColor: colors.primary + '1A',
                             tension: 0.4,
                             fill: true
                         },
                         {
                             label: 'خدمة',
                             data: [20000, 18000, 25000, 24000, 18000, 28000],
-                            borderColor: '#10B981',
-                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderColor: colors.secondary,
+                            backgroundColor: colors.secondary + '1A',
                             tension: 0.4,
                             fill: true
                         },
                         {
                             label: 'استشارة',
                             data: [10000, 9000, 15000, 15000, 8000, 17000],
-                            borderColor: '#F59E0B',
-                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            borderColor: colors.accent,
+                            backgroundColor: colors.accent + '1A',
                             tension: 0.4,
                             fill: true
                         }
@@ -1986,6 +2693,7 @@
 
         function initComparisonPage(data) {
             if (!data) data = DataService.getDummyData();
+            const colors = getChartColors();
             
             // Yearly table
             const tbody = document.getElementById('yearlyTableBody');
@@ -2012,16 +2720,16 @@
                         {
                             label: '2025',
                             data: [65, 59, 80, 81, 56, 95, 70, 75, 85, 90, 88, 92],
-                            borderColor: '#3B82F6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderColor: colors.primary,
+                            backgroundColor: colors.primary + '1A',
                             tension: 0.4,
                             fill: true
                         },
                         {
                             label: '2024',
                             data: [55, 50, 70, 72, 48, 82, 60, 65, 75, 80, 78, 85],
-                            borderColor: '#10B981',
-                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderColor: colors.secondary,
+                            backgroundColor: colors.secondary + '1A',
                             tension: 0.4,
                             fill: true
                         }
@@ -2051,12 +2759,12 @@
                         {
                             label: 'المستهدف',
                             data: [100, 100, 100, 100, 100, 100],
-                            backgroundColor: '#94A3B8'
+                            backgroundColor: colors.accent
                         },
                         {
                             label: 'الفعلي',
                             data: [65, 59, 80, 81, 56, 95],
-                            backgroundColor: '#3B82F6'
+                            backgroundColor: colors.primary
                         }
                     ]
                 },
@@ -2075,8 +2783,21 @@
 
         function initDetailsPage(data) {
             if (!data) {
-                console.warn('initDetailsPage: No data provided, using dummy data');
-                data = DataService.getDummyData();
+                console.warn('initDetailsPage: No data provided, trying to fetch...');
+                // Try to fetch data if not provided
+                const filters = getCurrentFilters();
+                fetchRevenueDataCached(filters).then(fetchedData => {
+                    if (fetchedData && fetchedData.details && fetchedData.details.length > 0) {
+                        initDetailsPage(fetchedData);
+                    } else {
+                        console.warn('initDetailsPage: No data available, using dummy data');
+                        initDetailsPage(DataService.getDummyData());
+                    }
+                }).catch(err => {
+                    console.error('initDetailsPage: Error fetching data:', err);
+                    initDetailsPage(DataService.getDummyData());
+                });
+                return;
             }
             
             console.log('initDetailsPage called with:', {
@@ -2086,18 +2807,34 @@
             });
             
             const tbody = document.getElementById('detailsTableBody');
+            if (!tbody) {
+                console.error('initDetailsPage: detailsTableBody not found');
+                return;
+            }
             
             if (!data.details || data.details.length === 0) {
                 console.warn('initDetailsPage: No details data available');
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="7" class="px-6 py-8 text-center text-gray-500">
-                            لا توجد بيانات للعرض. تأكد من تحميل ملف Excel أو تطبيق الفلاتر.
+                            <div class="flex flex-col items-center gap-2">
+                                <i class="ph ph-file-x text-4xl text-gray-400"></i>
+                                <p class="font-medium">لا توجد بيانات للعرض</p>
+                                <p class="text-sm">تأكد من:</p>
+                                <ul class="text-sm text-right list-disc list-inside">
+                                    <li>وجود ملف Excel في نفس المجلد (dashboard-data.xlsx)</li>
+                                    <li>أن الملف يحتوي على بيانات</li>
+                                    <li>تطبيق الفلاتر المناسبة</li>
+                                </ul>
+                                <button onclick="applyFilters()" class="mt-4 bg-blue-900 hover:bg-blue-800 text-white font-medium rounded-lg text-sm px-5 py-2.5 transition">
+                                    <i class="ph ph-arrow-clockwise"></i> تحديث البيانات
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 `;
                 // Update pagination text
-                const paginationText = document.querySelector('.mt-4 .text-sm.text-gray-500');
+                const paginationText = document.querySelector('#details .mt-4 .text-sm.text-gray-500, #details .text-sm.text-gray-400');
                 if (paginationText) {
                     paginationText.textContent = 'عرض 0 من 0';
                 }
@@ -2135,6 +2872,45 @@
         // INITIALIZATION
         // ============================================
         document.addEventListener('DOMContentLoaded', async () => {
+            // Load saved theme
+            loadSavedTheme();
+            
+            // Setup theme dropdown
+            const themeToggleBtn = document.getElementById('themeToggleBtn');
+            const themeDropdown = document.getElementById('themeDropdownMenu');
+            
+            if (themeToggleBtn) {
+                themeToggleBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleThemeDropdown();
+                });
+            }
+            
+            // Setup theme option buttons
+            document.querySelectorAll('.theme-option').forEach(option => {
+                option.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const themeName = option.getAttribute('data-theme');
+                    if (themeName) {
+                        selectTheme(themeName);
+                    }
+                });
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                const container = document.getElementById('themeDropdownContainer');
+                if (container && !container.contains(e.target)) {
+                    if (themeDropdown) {
+                        themeDropdown.classList.add('hidden');
+                    }
+                }
+            });
+            
+            // Update dropdown UI with current theme
+            const currentTheme = document.body.getAttribute('data-theme') || 'light';
+            updateThemeDropdownUI(currentTheme);
+            
             // Load user preferences
             loadUserPreferences();
             
@@ -2152,8 +2928,8 @@
                 const filters = getCurrentFilters();
                 const initialData = await DataService.fetchRevenueData(filters);
                 if (initialData) {
-                    initOverviewCharts(initialData);
-                    updateKPIs(initialData);
+            initOverviewCharts(initialData);
+            updateKPIs(initialData);
                     updateTables(initialData); // Update tables as well
                 } else {
                     // Fallback to dummy data if Excel fails
