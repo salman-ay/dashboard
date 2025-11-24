@@ -220,83 +220,86 @@
         }
         
         /* Sidebar Styles */
-        [data-theme="light"] aside {
+        [data-theme="light"] aside,
+        [data-theme="light"] #mobileSidebar {
             background-color: var(--bg-sidebar) !important;
             border-color: var(--border-sidebar) !important;
         }
         
-        [data-theme="light"] aside .text-blue-900 {
+        [data-theme="light"] aside .text-blue-900,
+        [data-theme="light"] #mobileSidebar .text-blue-900 {
             color: white !important;
         }
         
-        [data-theme="light"] aside .nav-item:not(.active) {
+        [data-theme="light"] aside .nav-item:not(.active),
+        [data-theme="light"] #mobileSidebar .nav-item:not(.active) {
             color: rgba(255, 255, 255, 0.8) !important;
         }
         
-        [data-theme="light"] aside .nav-item:not(.active):hover {
+        [data-theme="light"] aside .nav-item:not(.active):hover,
+        [data-theme="light"] #mobileSidebar .nav-item:not(.active):hover {
             background-color: rgba(255, 255, 255, 0.1) !important;
             color: white !important;
         }
         
         [data-theme="light"] aside .border-b,
-        [data-theme="light"] aside .border-t {
+        [data-theme="light"] aside .border-t,
+        [data-theme="light"] #mobileSidebar .border-b,
+        [data-theme="light"] #mobileSidebar .border-t {
             border-color: rgba(255, 255, 255, 0.2) !important;
         }
         
-        [data-theme="dark"] aside {
+        [data-theme="dark"] aside,
+        [data-theme="dark"] #mobileSidebar {
             background-color: var(--bg-sidebar) !important;
             border-color: var(--border-sidebar) !important;
         }
         
-        [data-theme="mono"] aside {
+        [data-theme="mono"] aside,
+        [data-theme="mono"] #mobileSidebar {
             background-color: var(--bg-sidebar) !important;
             border-color: var(--border-sidebar) !important;
         }
         
-        [data-theme="mono"] aside .text-blue-900 {
+        [data-theme="mono"] aside .text-blue-900,
+        [data-theme="mono"] #mobileSidebar .text-blue-900 {
             color: white !important;
         }
         
-        [data-theme="mono"] aside .nav-item:not(.active) {
+        [data-theme="mono"] aside .nav-item:not(.active),
+        [data-theme="mono"] #mobileSidebar .nav-item:not(.active) {
             color: rgba(255, 255, 255, 0.8) !important;
         }
         
-        [data-theme="mono"] aside .nav-item:not(.active):hover {
+        [data-theme="mono"] aside .nav-item:not(.active):hover,
+        [data-theme="mono"] #mobileSidebar .nav-item:not(.active):hover {
             background-color: rgba(255, 255, 255, 0.1) !important;
             color: white !important;
         }
         
         [data-theme="mono"] aside .border-b,
-        [data-theme="mono"] aside .border-t {
+        [data-theme="mono"] aside .border-t,
+        [data-theme="mono"] #mobileSidebar .border-b,
+        [data-theme="mono"] #mobileSidebar .border-t {
             border-color: rgba(255, 255, 255, 0.2) !important;
         }
         
         [data-theme="dark"] aside .border-b,
-        [data-theme="dark"] aside .border-t {
+        [data-theme="dark"] aside .border-t,
+        [data-theme="dark"] #mobileSidebar .border-b,
+        [data-theme="dark"] #mobileSidebar .border-t {
             border-color: var(--border-sidebar) !important;
         }
         
-        [data-theme="mono"] aside .border-b,
-        [data-theme="mono"] aside .border-t {
-            border-color: var(--border-sidebar) !important;
+        [data-theme="dark"] aside .nav-item:not(.active),
+        [data-theme="dark"] #mobileSidebar .nav-item:not(.active) {
+            color: rgba(255, 255, 255, 0.8) !important;
         }
         
-        [data-theme="dark"] .nav-item:not(.active) {
-            color: var(--text-secondary) !important;
-        }
-        
-        [data-theme="dark"] .nav-item:not(.active):hover {
-            background-color: var(--nav-hover) !important;
-            color: var(--text-primary) !important;
-        }
-        
-        [data-theme="mono"] .nav-item:not(.active) {
-            color: var(--text-secondary) !important;
-        }
-        
-        [data-theme="mono"] .nav-item:not(.active):hover {
-            background-color: var(--nav-hover) !important;
-            color: var(--text-primary) !important;
+        [data-theme="dark"] aside .nav-item:not(.active):hover,
+        [data-theme="dark"] #mobileSidebar .nav-item:not(.active):hover {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            color: white !important;
         }
         
         /* Header Styles */
@@ -611,19 +614,19 @@
                     <i class="ph ph-squares-four text-xl"></i>
                     ملخص الإيرادات
                 </a>
-                <a href="#" onclick="showPage('accounts'); return false;" class="nav-item flex items-center gap-3 p-3 text-gray-500 hover:bg-gray-50 hover:text-blue-900 rounded-lg transition">
+                <a href="#" onclick="showPage('accounts'); return false;" class="nav-item flex items-center gap-3 p-3 text-white hover:bg-gray-50 hover:text-blue-900 rounded-lg transition">
                     <i class="ph ph-bank text-xl"></i>
                     تحليل الحسابات
                 </a>
-                <a href="#" onclick="showPage('tabs'); return false;" class="nav-item flex items-center gap-3 p-3 text-gray-500 hover:bg-gray-50 hover:text-blue-900 rounded-lg transition">
+                <a href="#" onclick="showPage('tabs'); return false;" class="nav-item flex items-center gap-3 p-3 text-white hover:bg-gray-50 hover:text-blue-900 rounded-lg transition">
                     <i class="ph ph-tag text-xl"></i>
                     تحليل التبويب
                 </a>
-                <a href="#" onclick="showPage('comparison'); return false;" class="nav-item flex items-center gap-3 p-3 text-gray-500 hover:bg-gray-50 hover:text-blue-900 rounded-lg transition">
+                <a href="#" onclick="showPage('comparison'); return false;" class="nav-item flex items-center gap-3 p-3 text-white hover:bg-gray-50 hover:text-blue-900 rounded-lg transition">
                     <i class="ph ph-trend-up text-xl"></i>
                     مقارنة السنوات
                 </a>
-                <a href="#" onclick="showPage('details'); return false;" class="nav-item flex items-center gap-3 p-3 text-gray-500 hover:bg-gray-50 hover:text-blue-900 rounded-lg transition">
+                <a href="#" onclick="showPage('details'); return false;" class="nav-item flex items-center gap-3 p-3 text-white hover:bg-gray-50 hover:text-blue-900 rounded-lg transition">
                     <i class="ph ph-table text-xl"></i>
                     الجدول التفصيلي
                 </a>
@@ -1238,14 +1241,29 @@
                 <i class="ph ph-chart-polar"></i>
                 <span>إيراداتي</span>
             </div>
-            <button id="closeMobileMenu" class="text-gray-500"><i class="ph ph-x text-xl"></i></button>
+            <button id="closeMobileMenu" class="text-gray-500 hover:text-gray-700"><i class="ph ph-x text-xl"></i></button>
         </div>
         <nav class="p-4 space-y-2">
-            <a href="#" onclick="showPage('overview'); toggleMobileMenu(); return false;" class="flex items-center gap-3 p-3 text-blue-900 bg-blue-50 rounded-lg font-bold">ملخص الإيرادات</a>
-            <a href="#" onclick="showPage('accounts'); toggleMobileMenu(); return false;" class="flex items-center gap-3 p-3 text-gray-500">تحليل الحسابات</a>
-            <a href="#" onclick="showPage('tabs'); toggleMobileMenu(); return false;" class="flex items-center gap-3 p-3 text-gray-500">تحليل التبويب</a>
-            <a href="#" onclick="showPage('comparison'); toggleMobileMenu(); return false;" class="flex items-center gap-3 p-3 text-gray-500">مقارنة السنوات</a>
-            <a href="#" onclick="showPage('details'); toggleMobileMenu(); return false;" class="flex items-center gap-3 p-3 text-gray-500">الجدول التفصيلي</a>
+            <a href="#" onclick="showPage('overview'); toggleMobileMenu(); return false;" class="nav-item active flex items-center gap-3 p-3 text-white bg-blue-900 rounded-lg font-bold">
+                <i class="ph ph-squares-four text-xl"></i>
+                ملخص الإيرادات
+            </a>
+            <a href="#" onclick="showPage('accounts'); toggleMobileMenu(); return false;" class="nav-item flex items-center gap-3 p-3 text-white hover:bg-gray-50 hover:text-blue-900 rounded-lg transition">
+                <i class="ph ph-bank text-xl"></i>
+                تحليل الحسابات
+            </a>
+            <a href="#" onclick="showPage('tabs'); toggleMobileMenu(); return false;" class="nav-item flex items-center gap-3 p-3 text-white hover:bg-gray-50 hover:text-blue-900 rounded-lg transition">
+                <i class="ph ph-tag text-xl"></i>
+                تحليل التبويب
+            </a>
+            <a href="#" onclick="showPage('comparison'); toggleMobileMenu(); return false;" class="nav-item flex items-center gap-3 p-3 text-white hover:bg-gray-50 hover:text-blue-900 rounded-lg transition">
+                <i class="ph ph-trend-up text-xl"></i>
+                مقارنة السنوات
+            </a>
+            <a href="#" onclick="showPage('details'); toggleMobileMenu(); return false;" class="nav-item flex items-center gap-3 p-3 text-white hover:bg-gray-50 hover:text-blue-900 rounded-lg transition">
+                <i class="ph ph-table text-xl"></i>
+                الجدول التفصيلي
+            </a>
         </nav>
     </aside>
 
@@ -2162,14 +2180,16 @@
             document.getElementById('pageTitle').textContent = pageTitles[pageId];
             
             document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active', 'bg-blue-900', 'text-white');
-                item.classList.add('text-gray-500');
+                item.classList.remove('active', 'bg-blue-900');
+                // Keep text-white for all nav items
+                if (!item.classList.contains('text-white')) {
+                    item.classList.add('text-white');
+                }
             });
             
             const clickedItem = event.target.closest('.nav-item');
             if (clickedItem) {
                 clickedItem.classList.add('active', 'bg-blue-900', 'text-white');
-                clickedItem.classList.remove('text-gray-500');
             }
             
             // Load data for the page
